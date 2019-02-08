@@ -1,0 +1,141 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+```{r, echo = FALSE}
+library(geneplot)
+```
+
+# geneplot
+
+`geneplot` is an R package for genetic assignment and analysis of population structure. It can be used with microsatellite or SNP data. The algorithms are related to the GENECLASS2 software package. `geneplot` provides visualizations of the population structure and assignment results.
+
+`geneplot` can be used to compare the genetic patterns of different populations, to assess the level of genetic connectedness or separation among them. It also performs genetic assignment, comparing individuals to populations to determine the *source population* of each individual i.e. the population that the individual originated from.
+
+## Installation
+
+You can install the released version of geneplot from [GitHub](https://github.com/lfmcmillan/geneplot) with:
+
+``` r
+# Install geneplot from GitHub
+remotes::install_github("lfmcmillan/geneplot")
+
+# Load the geneplot package
+library(geneplot)
+```
+## Get started with **geneplot**
+
+Read the short introductory vignette to get you started with **geneplot**, and
+have a look at the simple, reproducible examples of the `geneplot` function.
+
+```{r, eval = FALSE}
+# Read the short vignette
+vignette("introduction-to-geneplot")
+# Reproduce a simple example
+example(geneplot)
+```
+If you want to use Genepop-format data in `geneplot`, there's a simple extra step to import it, as described in the Genepop format vignette:
+```{r, eval = FALSE}
+vignette("importing-genepop-format")
+```
+
+## Example
+
+The following code creates a dataset in the format suitable for GenePlot, which has columns for individual IDs and population/sample labels, and then two columns for each locus, named in the pattern Loc1.a1, Loc1.a2, Loc2.a1, Loc2.a2, etc. The 'pop' column containing the population/sample labels must be strings rather than factors.
+
+```{r}
+ ratLocnames <- c("D10Rat20","D11Mgh5","D15Rat77","D16Rat81","D18Rat96","D19Mit2","D20Rat46","D2Rat234","D5Rat83","D7Rat13")
+ ratData <- rbind(
+ c("Ki001","Kai",96,128,246,280,234,250,155,165,226,232,219,231,149,149,101,127,174,176,164,182),
+ c("Ki002","Kai",122,126,246,276,238,238,155,165,226,232,223,231,187,187,107,121,174,174,164,164),
+ c("Ki003","Kai",122,122,276,280,234,234,157,165,244,244,231,231,187,187,107,107,174,174,164,182),
+ c("Ki004","Kai",130,130,276,280,238,238,157,165,0,0,223,231,187,187,101,111,168,176,184,184),
+ c("Ki009","Kai",122,122,276,276,234,236,165,165,240,244,229,231,187,187,89,101,174,176,164,164),
+ c("Ki010","Kai",122,122,278,280,236,236,155,165,236,244,219,231,185,187,101,101,168,174,164,164),
+ c("Ki011","Kai",120,128,280,282,236,238,155,165,226,236,223,231,149,149,99,101,174,174,164,164),
+ c("Bi01","Brok",96,126,280,280,236,250,165,165,232,246,231,231,185,187,89,89,170,176,154,164),
+ c("Bi02","Brok",96,126,280,280,250,262,155,155,232,232,231,233,149,185,127,127,174,174,164,166),
+ c("Bi03","Brok",96,126,280,280,258,262,165,165,232,232,231,231,185,187,89,127,174,174,164,164),
+ c("Bi04","Brok",96,126,280,280,238,262,155,155,232,232,231,233,149,185,127,127,174,174,164,164),
+ c("Bi05","Brok",96,122,280,280,250,258,155,155,226,244,231,231,187,187,107,127,174,176,164,164),
+ c("Bi06","Brok",96,96,280,280,238,262,155,155,232,232,231,231,187,187,123,127,174,174,164,164),
+ c("Bi11","Brok",96,96,278,280,234,250,165,165,226,240,231,231,149,187,89,99,170,170,154,164),
+ c("Bi12","Brok",96,96,276,280,234,250,165,165,240,240,231,231,187,187,89,99,170,174,154,164),
+ c("Bi13","Brok",96,126,276,276,246,250,165,165,226,244,231,231,149,187,99,99,174,174,164,164),
+ c("Bi14","Brok",96,126,276,276,262,262,155,165,226,244,231,231,149,187,89,107,170,174,154,164),
+ c("Ki092","Main",122,126,280,282,234,238,165,165,236,240,231,231,149,187,95,95,0,0,164,164),
+ c("Ki093","Main",122,126,282,282,238,238,165,165,236,240,231,231,149,187,95,107,166,174,164,182),
+ c("Ki094","Main",122,126,280,282,238,238,165,165,226,240,231,231,173,187,95,127,174,176,154,182),
+ c("Ki095","Main",120,126,280,280,234,236,155,165,244,246,231,231,161,187,123,127,174,174,154,154),
+ c("Ki097","Main",122,126,280,280,236,236,163,165,236,242,219,231,149,161,107,115,166,174,164,166),
+ c("Ki098","Main",96,122,276,280,236,238,155,165,242,244,233,233,149,187,99,107,174,174,164,164),
+ c("Ki100","Main",122,122,280,280,234,234,155,165,236,236,219,235,0,0,107,107,174,176,164,164),
+ c("Ki101","Main",122,126,276,280,234,238,155,155,236,244,229,231,0,0,101,101,0,0,164,182),
+ c("Ki102","Main",122,126,0,0,0,0,155,163,0,0,229,231,0,0,107,107,0,0,0,0),
+ c("Ki103","Main",122,122,280,280,234,236,163,165,0,0,231,233,0,0,99,107,0,0,164,184),
+ c("Ki104","Main",96,126,276,280,236,238,157,165,230,246,231,231,149,187,107,107,0,0,164,164),
+ c("Ki105","Main",122,126,276,280,238,250,157,165,226,244,217,231,0,0,111,121,174,174,164,164),
+ c("R01","Erad10",128,128,280,288,234,244,155,165,242,244,231,231,149,149,107,107,174,174,164,166),
+ c("R02","Erad10",128,130,276,288,238,244,155,155,228,244,223,231,149,149,101,111,174,174,164,166),
+ c("R03","Erad10",128,130,276,288,238,244,155,155,244,244,223,231,149,187,107,111,174,176,164,166))
+ ratData <- as.data.frame(ratData, stringsAsFactors=FALSE)
+ names(ratData) <- c("id","pop","D10Rat20.a1","D10Rat20.a2","D11Mgh5.a1","D11Mgh5.a2",
+                     "D15Rat77.a1","D15Rat77.a2","D16Rat81.a1","D16Rat81.a2",
+                     "D18Rat96.a1","D18Rat96.a2","D19Mit2.a1","D19Mit2.a2",
+                     "D20Rat46.a1","D20Rat46.a2","D2Rat234.a1","D2Rat234.a2",
+                     "D5Rat83.a1","D5Rat83.a2","D7Rat13.a1","D7Rat13.a2")
+```
+The populations/samples in this dataset are Kai, Main, Brok and Erad10.
+
+This is a basic example of running GenePlot using the dataset created above:
+
+```{r example1}
+## Running geneplot on two populations, Brok and Main:
+geneplot(ratData, c("Brok","Main"), locnames=ratLocnames)
+
+## Running geneplot on all the populations in the dataset, and capturing the output in the results object:
+results <- geneplot(ratData, unique(ratData$pop), locnames=ratLocnames)
+```
+
+The main function in the `geneplot` package is `geneplot`. This runs the GenePlot calculations and also plots the graphs. 
+
+You can alternatively run the calculations using `calc_logprob` and then produce the plots using `plot_logprob`. The output of `calc_logprob` is the same as the output of GenePlot, and can then be passed into `plot_logprob`. This can be useful if you want to run the calculations just once, and then rerun the plot function to test different colour combinations and display options on the same calculated results.
+
+```{r example2}
+## Running geneplot on two populations, Brok and Main:
+results <- calc_logprob(ratData, c("Brok","Main"), locnames=ratLocnames)
+
+## Running geneplot on all the populations in the dataset:
+plot_logprob(results)
+```
+
+### Genepop-format data
+
+The vignette 'importing-genepop-format' describes how to import data from a Genepop-format file into the form required by `geneplot`.
+
+Here is a quick example of code that would import a file in Genepop format, using 3 digits per allele and specifying the population names using the pop_names input. After importing the Genepop-format data, the data and the names of the loci must be passed separately into the `geneplot` function, and the user also has to specify which populations to use.
+
+```{r, eval = FALSE}
+genepopData <- read_genepop_format(file="C:/Users/me/Documents/myfile.gen", digits_per_allele=3, pop_names=c("PopA","PopB","PopC"))
+dat <- genepopData$popData
+locnames <- genepopData$locnames
+
+geneplot(dat=dat,refpopnames=c("PopA","PopB"),locnames=locnames)
+```
+
+
+## Citation
+
+```{r}
+citation("geneplot")
+```

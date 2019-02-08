@@ -1,0 +1,337 @@
+---
+title: "Getting Started with GenePlot"
+author: "Louise McMillan"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width=5, fig.height=5)
+
+library(geneplot)
+```
+
+```{r, include=FALSE}
+library(knitr)
+opts_knit$set(global.par = TRUE) ## Set package option for knitr -- this is NOT the same as changing the chunk options like we did above with opts_chunk$set
+```
+
+```{r, include=FALSE}
+par(mar=c(3,3,0.75,0.75),mgp=c(2,0.7,0)) # set narrower plot margins (must be in a separate chunk to the calls to plot, because of the way the global.par option works in knitr)
+``` 
+
+## Introduction 
+
+The main function in the `geneplot` package is `geneplot`. This runs the GenePlot calculations and also plots the graphs. You can alternatively run the calculations using `calc_logprob` and then produce the plots using `plot_logprob`. The output of `calc_logprob` is the same as the output of GenePlot, and can then be passed into `plot_logprob`.
+
+The purpose of GenePlot is to compare the genetic patterns of different populations to assess the level of genetic connectedness or separation among them, and to compare individuals to populations, typically to determine the *source population* i.e. the population that the individual originated from.
+
+The algorithms in the `geneplot` package are related to the methodology of the GENECLASS2 software. `geneplot` takes in diploid microsatellite or SNP data from a set of *reference samples*, which are individuals with known origin (or assumed known origin) from a set of reference populations. When trying to determine the likely source population of an individual, GenePlot can calculate the individual's fit to any of the reference populations that are present in the reference sample i.e. the reference populations are the possible candidate source populations for an individual.
+
+GenePlot takes the reference samples and estimates the allele frequencies of the given reference populations, using the Bayesian method of Rannala and Mountain. Non-zero priors are defined for *all* allele types observed in any of the reference samples specified for a given GenePlot run, because even if they are not observed in some of those reference samples then it is still possible that they are present but unobserved in those reference populations. The observed frequencies of the alleles in the references samples then combine with the priors to give posterior allele frequencies for all the allele types in all the specified reference populations.
+
+GenePlot then calculates log-posterior genotype probabilities, referred to here as **Log-Genotype Probabilities** (LGPs), for all of the individuals considered, with respect to each of the specified reference populations. The set of individuals considered will be any that are in the specified reference samples, and also any additional individuals that are to be compared to the reference samples.
+
+For example, if there are two reference populations, Pop1 and Pop2, and three individuals, ID1, ID2 and ID3, then GenePlot will calculate the following Log-Genotype Probabilities:
+
+| ID   | Pop1 LGP | Pop2 LGP |
+|:-----|---------:|---------:|
+| ID1  |  -8.15   | -19.43   |
+| ID2  | -15.35   |  -7.33   |
+| ID3  | -11.40   | -12.96   |
+
+Each of these Log-Genotype Probabilities gives the probability of that individual's genotype arising in that population, given the posterior allele frequencies in that population. This can be thought of as the individual's *fit* to that population.
+
+The Log-Genotype Probabilities are *likelihoods* in a Bayesian sense, and the Log-Genotype Probabilities with respect to one population are totally separate to the Log-Genotype Probabilities with respect to the other reference populations. They are **NOT** probabilities relative to the other populations e.g. the LGP for individual ID1 in Pop1 does **NOT** give the probability that individual ID1 came from Pop1 rather than Pop2, they only give the probability of that individual's genotype arising in Pop1 rather than any other possible individuals that could have arisen in Pop1. ID1 may have very *high* Log-Genotype Probabilities for **all** the reference populations, in which case it will be difficult to assign the individual to any single reference population.
+
+## Examples for two reference populations
+
+`geneplot` requires data in a particular format, but it can also import code in Genepop format, using the function `read_genepop_format`. For more details, see the 'importing-genepop-format' vignette.
+
+The following code creates a dataset in the format suitable for GenePlot, which has columns for individual IDs and population/sample labels, and then two columns for each locus, named in the pattern Loc1.a1, Loc1.a2, Loc2.a1, Loc2.a2, etc. The 'pop' column containing the population/sample labels must be strings rather than factors.
+
+```{r}
+ ratLocnames <- c("D10Rat20","D11Mgh5","D15Rat77","D16Rat81","D18Rat96","D19Mit2","D20Rat46","D2Rat234","D5Rat83","D7Rat13")
+ ratData <- rbind(
+ c("Ki001","Kai",96,128,246,280,234,250,155,165,226,232,219,231,149,149,101,127,174,176,164,182),
+ c("Ki002","Kai",122,126,246,276,238,238,155,165,226,232,223,231,187,187,107,121,174,174,164,164),
+ c("Ki003","Kai",122,122,276,280,234,234,157,165,244,244,231,231,187,187,107,107,174,174,164,182),
+ c("Ki004","Kai",130,130,276,280,238,238,157,165,0,0,223,231,187,187,101,111,168,176,184,184),
+ c("Ki009","Kai",122,122,276,276,234,236,165,165,240,244,229,231,187,187,89,101,174,176,164,164),
+ c("Ki010","Kai",122,122,278,280,236,236,155,165,236,244,219,231,185,187,101,101,168,174,164,164),
+ c("Ki011","Kai",120,128,280,282,236,238,155,165,226,236,223,231,149,149,99,101,174,174,164,164),
+ c("Bi01","Brok",96,126,280,280,236,250,165,165,232,246,231,231,185,187,89,89,170,176,154,164),
+ c("Bi02","Brok",96,126,280,280,250,262,155,155,232,232,231,233,149,185,127,127,174,174,164,166),
+ c("Bi03","Brok",96,126,280,280,258,262,165,165,232,232,231,231,185,187,89,127,174,174,164,164),
+ c("Bi04","Brok",96,126,280,280,238,262,155,155,232,232,231,233,149,185,127,127,174,174,164,164),
+ c("Bi05","Brok",96,122,280,280,250,258,155,155,226,244,231,231,187,187,107,127,174,176,164,164),
+ c("Bi06","Brok",96,96,280,280,238,262,155,155,232,232,231,231,187,187,123,127,174,174,164,164),
+ c("Bi11","Brok",96,96,278,280,234,250,165,165,226,240,231,231,149,187,89,99,170,170,154,164),
+ c("Bi12","Brok",96,96,276,280,234,250,165,165,240,240,231,231,187,187,89,99,170,174,154,164),
+ c("Bi13","Brok",96,126,276,276,246,250,165,165,226,244,231,231,149,187,99,99,174,174,164,164),
+ c("Bi14","Brok",96,126,276,276,262,262,155,165,226,244,231,231,149,187,89,107,170,174,154,164),
+ c("Ki092","Main",122,126,280,282,234,238,165,165,236,240,231,231,149,187,95,95,0,0,164,164),
+ c("Ki093","Main",122,126,282,282,238,238,165,165,236,240,231,231,149,187,95,107,166,174,164,182),
+ c("Ki094","Main",122,126,280,282,238,238,165,165,226,240,231,231,173,187,95,127,174,176,154,182),
+ c("Ki095","Main",120,126,280,280,234,236,155,165,244,246,231,231,161,187,123,127,174,174,154,154),
+ c("Ki097","Main",122,126,280,280,236,236,163,165,236,242,219,231,149,161,107,115,166,174,164,166),
+ c("Ki098","Main",96,122,276,280,236,238,155,165,242,244,233,233,149,187,99,107,174,174,164,164),
+ c("Ki100","Main",122,122,280,280,234,234,155,165,236,236,219,235,0,0,107,107,174,176,164,164),
+ c("Ki101","Main",122,126,276,280,234,238,155,155,236,244,229,231,0,0,101,101,0,0,164,182),
+ c("Ki102","Main",122,126,0,0,0,0,155,163,0,0,229,231,0,0,107,107,0,0,0,0),
+ c("Ki103","Main",122,122,280,280,234,236,163,165,0,0,231,233,0,0,99,107,0,0,164,184),
+ c("Ki104","Main",96,126,276,280,236,238,157,165,230,246,231,231,149,187,107,107,0,0,164,164),
+ c("Ki105","Main",122,126,276,280,238,250,157,165,226,244,217,231,0,0,111,121,174,174,164,164),
+ c("R01","Erad10",128,128,280,288,234,244,155,165,242,244,231,231,149,149,107,107,174,174,164,166),
+ c("R02","Erad10",128,130,276,288,238,244,155,155,228,244,223,231,149,149,101,111,174,174,164,166),
+ c("R03","Erad10",128,130,276,288,238,244,155,155,244,244,223,231,149,187,107,111,174,176,164,166))
+ ratData <- as.data.frame(ratData, stringsAsFactors=FALSE)
+ names(ratData) <- c("id","pop","D10Rat20.a1","D10Rat20.a2","D11Mgh5.a1","D11Mgh5.a2",
+                     "D15Rat77.a1","D15Rat77.a2","D16Rat81.a1","D16Rat81.a2",
+                     "D18Rat96.a1","D18Rat96.a2","D19Mit2.a1","D19Mit2.a2",
+                     "D20Rat46.a1","D20Rat46.a2","D2Rat234.a1","D2Rat234.a2",
+                     "D5Rat83.a1","D5Rat83.a2","D7Rat13.a1","D7Rat13.a2")
+```
+The populations/samples in this dataset are Kai, Main, Brok and Erad10.
+
+The following code takes this dataset and runs GenePlot on two reference populations from the dataset, "Kai" and "Main". The call to `geneplot` provides the required input parameters for GenePlot:
+
+`dat` the name of the dataset
+
+`refpopnames` the names of the specified reference populations to use for the analysis 
+
+`locnames` the names of the loci to use for the analysis
+
+The loci names can be a subset of the loci in the dataset, but they must all be in the dataset.
+```{r}
+geneplot(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames,
+         short_axis_labels = TRUE, quantiles = NULL)
+```
+
+The `geneplot` function produces a table of Log-Genotype Probabilities for the rats in the Kai and Main samples, with respect to the Kai and Main populations (based on the estimated allele frequencies for those populations). `geneplot` also plots the Log-Genotype Probabilities on a graph where each point represents a single rat from Kai or Main and one axis corresponds to Log-Genotype Probabilities with respect to Kai and the other axis corresponds to Log-Genotype Probabilities with respect to Main. Thus we can see the Log-Genotype Probabilities for the rats with respect to Kai by checking their positions in the x-direction, and we can see the Log-Genotype Probabilities for the rats with respect to Main by checking their positions in the y-direction. 
+
+Rats in the right  half of the plot have high Log-Genotype Probabilities for Kai, i.e. have a good fit to Kai. Rats in the left half of the plot have a poor fit to Kai.
+
+Rats in the top half of the plot have high Log-Genotype Probabilities for Main, i.e. have a good fit to Main. Rats in the bottom half of the plot have a poor fit to Main.
+
+The axis labels are shortened because we set `short_axis_labels=TRUE`. The axes are labelled "LGP10 for population XXX" which is short for "Log10 genotype probability for population XXX". The default log base for the Log-Genotype Probabilities is 10, because that's easier to convert back to probabilities in your head. Use option `logten=FALSE` in `geneplot` or `calc_logprob` to use natural logs (base e), in which case the axes will be labelled "Log genotype probability for population XXX" or "LGP for population XXX".
+
+Rerun GenePlot without plotting, to show the results table only -- this is equivalent to calling `calc_logprob`:
+```{r}
+geneplot(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames,
+         plotit=FALSE)
+```
+
+The `geneplot` results object provides the Log-Genotype Probabilities with respect to Kai and Main in columns labelled "Kai" and "Main". As we would expect, indviduals in the Kai sample tend to have better fit to Kai than Main i.e. their Log-Genotype Probabilities for Kai are higher than their Log-Genotype Probabilities for Main. Individuals in the Main sample tend to have a better fit to Main than Kai i.e. their Log-Genotype probabilities for Main are higher than their Log-Genotype Probabilities for Kai. See the 'Missing Data' section below for more details of the rest of the results object.
+
+When running GenePlot for the Kai and Main reference populations, the allele frequencies will be estimated only for alleles that are found in at least one of the Kai and Main samples i.e. any alleles that are only found in the Brok or Erad10 samples will not be considered in this analysis. That is to say, the allele frequencies estimated for Kai may be different in this analysis than the allele frequencies that would be estimated for Kai if the specified reference populations for the GenePlot run were Kai, Main *and* Brok.
+
+### Changing colours and shapes and plot details
+
+Now rerun GenePlot for Kai and Main, specifying different colours and shapes for the two populations. This time, run the calculations using calc_logprob and then produce the plot using plot_logprob. That way, if we want to redo the plot again with different colours, we won't need to rerun the calculations.
+
+The colours can be specified using rgb objects, or hexadecimal code strings e.g. #FF92B1, or any of the accepted R colour names.
+The shapes are specified from the following list: "Circle", "Square", "Diamond", "TriangleUp", "TriangleDown", "OpenSquare", "OpenCircle", "OpenTriangleUp", "Plus", "Cross", "OpenDiamond", "OpenTriangleDown", "Asterisk". GenePlot will convert them automatically to the corresponding `pch` codes for plotting.
+
+This time we're going to use the default long-form axis labels.
+
+```{r}
+results <- calc_logprob(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames, 
+                        quantiles = NULL)
+
+plot_logprob(results, colvec=c("darkorchid4","steelblue"), shapevec=c("Circle","Square"))
+```
+
+Now replot those results, specifying a different range for the two axes (the same range is always used for both axes) and choosing a different position for the legend. The legend position can be specified in any form compatible with the `legend` function.
+
+This time we're going to write our own axis labels using the `axis_labels` parameter.
+
+```{r}
+plot_logprob(results, colvec=c("darkorchid4","steelblue"), shapevec=c("Circle","Square"),
+             xyrange=c(-20,-5), legend_pos="topleft",
+             axis_labels = c("LGP10 for population Kaikoura Island", "LGP10 for population Mainland"))
+```
+
+If you want to *not show* the legend, say if you are going to show it as a separate plot, set `use_legend=FALSE`.
+
+Finally, if you want to plot the individuals' IDs or population/sample labels, use `txt="id"` or `txt="pop"`:
+
+```{r}
+plot_logprob(results, txt="id", colvec=c("darkorchid4","steelblue"), 
+             legend_pos="topleft")
+```
+
+### Comparing additional samples to reference populations
+
+Now we're going to rerun GenePlot for the Kai and Main reference populations, but this time we're going to add another sample, the Erad10 sample, as an "included population". GenePlot will calculate Log-Genotype Probabilities for all the individuals in the Erad10 sample, with respect to both Kai and Main. This allows us to compare the individuals in Erad10 to both the Kai and Main reference populations, so see which they have a better fit to. 
+
+```{r}
+geneplot(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames,
+         includepopnames=c("Erad10"),
+         colvec=c("darkorchid4","steelblue","chartreuse4"), 
+         shapevec=c("Circle","Square","TriangleUp"),
+         short_axis_labels = TRUE, quantiles = NULL)
+```
+
+The `includepopnames` input defaults to NULL, and in that situation GenePlot will only calculate Log-Genotype Probabilities for the individuals in the specified reference samples. `includepopnames` is a character vector of population/sample labels, all of which must be present in the `dat` data frame.
+
+In this case, all three of the Erad10 individuals are in the bottom half of the plot i.e. they have a poor fit to the Main population. They are close to the horizontal midline, so they have a middling fit to the Kai population. Looking at the `geneplot` results object, we can see that individual R01 has a similar fit to Kai and to Main, whereas individuals R02 and R03 fit better to Kai than to Main.
+
+## Missing data
+
+The 'PopXX.raw' columns of the `geneplot` results object named with the population/sample labels from the dataset correspond to the Log-Genotype Probability results in GENECLASS2. For individuals with complete data at all of the loci specified in `locnames`, these values are the same as the 'PopXX' column values.
+
+Where the `geneplot` package differs from GENECLASS2 is in its handling of individuals who have missing data at one or more of the loci. GENECLASS2 calculates the Log-Genotype Probabilities for those individuals based on the loci that they *do* have data for, and these are the 'PopXXraw' columns in the `geneplot` results object. 
+
+GenePlot goes further by imputing the full-loci Log-Genotype Probabilities, based on the Log-Genotype Probability distributions for the populations. GenePlot finds the percentile for the given individual's reduced-data Log-Genotype Probability, i.e. where it falls in the distribution of all possible genotype probabilities based on those loci that it has data for. GenePlot then calculates the Log-Genotype Probability corresponding to that percentile in the distribution for the full set of loci.
+
+Thus GenePlot actually outputs two sets of Log-Genotype Probabilities for individuals with missing data: their "raw" Log-Genotype Probabilities based on the loci that they have data for, and their "imputed" Log-Genotype Probabilities based on the full set of loci, which are then fully comparable with the Log-Genotype Probabilities of other individuals in the dataset. 
+
+When GenePlot estimates the allele frequencies in the reference populations, those frequencies will be estimated based on the observed alleles in the sample, so if some individuals in the reference sample have missing data there may be fewer than 2n observed alleles for a given locus, where n is the size of the given reference sample.
+
+The results of GenePlot look something like the following (for an example dataset based on 10 loci):
+
+| ID   | pop  | status   | nloc | Pop1 LGP | Pop2 LGP | Pop1 LGP raw | Pop2 LGP raw |
+|:-----|-----:|---------:|-----:|---------:|---------:|-------------:|-------------:|
+| ID1  | Pop1 | complete | 10   |  -8.15   | -19.43   |       -8.15  |      -19.43  |
+| ID2  | Pop2 | impute   | 8    | -15.35   |  -7.33   |      -10.28  |      -12.60  |
+| ID3  | Pop3 | impute   | 7    | -18.40   | -12.96   |      -12.47  |      -14.57  |
+
+The `status` column shows "complete" or "impute" depending on whether the individual had complete data for the loci specified in `locnames`, and the `nloc` column shows the number of loci, out of those specified in `locnames`, for which the individual had data.
+
+GENECLASS2 generates the percentile values for the raw Log-Genotype Probabilities, but these are based on simulating genotypes from the allele frequencies. GenePlot uses the saddlepoint method to approximate the full Log-Genotype Probabilities, and this is a more accurate method of obtaining the percentiles, particularly for percentiles in the bottom tail of the distribution. The bottom tail of the distribution corresponds to very rare genotypes, of which there will be few in a simulated set, and so the simulated approximation to the lower tail of the distribution will be less accurate than the simulated approximation to the rest of the distribution, whereas the saddlepoint approximation is accurate over the full range of the distribution.
+
+Full details of the method are in McMillan and Fewster (2017), or contact Louise McMillan for more information.
+
+Example of running GenePlot with a subset of 9 of the original 10 loci in the dataset, and requiring all individuals considered to have at data for at least 8 of those loci:
+```{r}
+geneplot(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames[1:9],
+         includepopnames=c("Erad10"), min_loci=8, 
+         colvec=c("darkorchid4","steelblue","chartreuse4"), 
+         shapevec=c("Circle","Square","TriangleUp"),
+         short_axis_labels = TRUE, quantiles = NULL)
+```
+Now individual Ki03, who was included in the earlier runs of `geneplot`, has been excluded for having data at only 7 of the first 9 loci in the dataset. The default value for min_loci is 6.
+
+## Quantiles
+
+```{r}
+results <- geneplot(dat=ratData,refpopnames=c("Kai","Main"),locnames=ratLocnames, 
+         colvec=c("darkorchid4","steelblue"), shapevec=c("Circle","Square"),
+         short_axis_labels = TRUE, grayscale_quantiles = TRUE)
+```
+
+The GenePlot run above, for two reference populations, is the same as the earlier plots for Kai and Main, but this one now shows horizontal and vertical lines on the plot (which is the default setting for GenePlot when using two reference populations). These lines correspond to particular quantiles of the Log-Genotype Probability distributions for the two populations. The default values for the quantiles are c(0.01, 1.00) which plot the 1% and 100% quantiles, unless they fall outside the range of the plot.
+
+For example, considering population Kai, only 1% of all possible genotypes that could arise from the given population will have Log-Genotype Probabilities below the 1% quantile for Kai, and 99% of all possible genotypes arising from that population will have Log-Genotype Probabilities above the 1% quantile for Kai, i.e. almost all genotypes that could arise from Kai would have a **better** fit to Kai than a genotype at the 1% quantile.
+
+If we calculated the 99% quantile for population Kai, then 99% of possible genotypes from Kai would have Log-Genotype Probabilities for Kai below that 99% quantile, and 1% of all possible genotypes from Kai would have Log-Genotype Probabilities above that 99% quantile, i.e. almost all genotypes that could arise from Kai would have a **worse** fit to Kai than a genotype at the 99% quantile.
+
+The 100% quantile is the maximum possible Log-Genotype-Probability that any genotype can have with respect to the given population, though in this case the 100% quantiles are outside the range of the plot.
+
+Different quantiles can be requested using the input parameter `quantiles`, e.g. if `quantiles=c(0.05,0.2,0.8,0.95)` then the 5%, 20%, 80% and 95% quantiles will be calculated and plotted.
+
+If no quantiles are wanted, use `quantiles = NULL`.
+
+Quantile values will be provided as attributes to the output object of calc_logprob (see the Value section.) so their values can be extracted.
+
+The `grayscale_quantiles` option plots the quantiles in grey, which can make them easier to see when the selected colours for the populations are pale. Pale colours can work well for points with filled shapes (Circle, Square, Diamond, TriangleUp, TriangleDown) because they have black outlines so they're still visible, but pale quantiles are not very visible so if you are using the default colours, or pale colours, in `colvec` for two reference populations, it's probably a good idea to set `grayscale_quantiles=TRUE`.
+
+## Examples for multiple reference populations
+
+All the examples above are for two reference populations. If there are more than two reference populations, then the results object is equivalent to the results object for two reference populations, just with additional PopXX and PopXX.raw columns for the additional reference populations. The following code runs GenePlot for three reference populations (Kai, Main and Brok):
+
+```{r}
+results <- calc_logprob(dat=ratData,refpopnames=c("Kai","Main","Brok"),
+                        locnames=ratLocnames)
+results
+```
+
+GenePlot has two different methods for plotting the results for more than two reference populations.
+
+By default, when there are more than two reference populations, GenePlot runs the calculations and then applies Principal Components Analysis (PCA) to the Log-Genotype Probabilities, and then plots the first two Principal Components, PC1 and PC2, showing in the axis labels how much variance is captured by each of those PCs.
+
+This is **not** the same as running PCA on the raw genetic data. This method makes use of the genotype data across multiple loci, and then just reduces the dimensionality of the results to enable them to be plotted.
+
+```{r}
+plot_logprob(results,
+         colvec=c("darkorchid4","steelblue","darkgoldenrod"), 
+         shapevec=c("Circle","Square","Diamond"))
+```
+
+This PCA plot allows you to see which populations cluster together, but this clustering is based on Log-Genotype Probabilities, not just on the raw genetic data.
+
+If we want to display different principal components, up to PCX, where X is the number of reference populations, we can specify the two PCs we want to display using `dim1` and `dim2`:
+
+```{r}
+plot_logprob(results, dim1=2, dim2=3,
+         colvec=c("darkorchid4","steelblue","darkgoldenrod"), 
+         shapevec=c("Circle","Square","Diamond"))
+```
+
+For multiple populations, GenePlot will still calculate any requested quantiles, which can be extracted from the results object using `attributes(results)$qmat`, but quantile lines will not be plotted on the PCA plot.
+
+GenePlot also has an alternative way of plotting the results for more than two reference populations. If we set `plot_bars=TRUE` then GenePlot will plot multiple bar charts, one for each reference population, with one bar per individual in the specified samples.
+```{r, fig.height=10, fig.width=7}
+plot_logprob(results, plot_bars=TRUE,
+         colvec=c("darkorchid4","steelblue","darkgoldenrod"))
+```
+
+The individuals in one of the reference populations are ordered according to their Log-Genotype Probabilities for their own population, and that ordering is preserved in all the other bar plots. So the individuals from Kai are ordered according to the Log-Genotype Probabilities for Kai, the Main ones ordered by their LGPs for Main, etc.
+
+
+## Results object attributes
+
+At the end of `calc_logprob` or `geneplot` the details of the algorithm used to calculate the results are attached as `attributes` to the results object. If your call to GenePlot is e.g.
+      `Pop1_vs_Pop2_results <- calc.logprob.func(ratData, c("Pop1","Pop2"), locnames=ratLocnames)`
+then you would find out the attributes using `attributes(Pop1_vs_Pop2_results)$saddlepoint etc.
+
+Other attributes attached to the results object are:
+
+`attributes(results)$min.loci` -- the minimum number of loci to require for any individual to be assigned, so any individual with fewer loci will be excluded from analysis
+      
+`attributes(results)$n.too.few` -- the number of individuals that have been excluded from the analysis because they had too few loci
+      
+`attributes(results)$percent.missing` -- the percentage of individuals that have been excluded, out of all those in the samples listed in `allpopnames`
+      
+`attributes(results)$qmat` -- the values of the plotted quantiles for the populations, with the % labels of the quantiles as the column names e.g. if quantiles=c(0.05,0.99) was the input to chart.func then qmat will be of the form
+```
+         5%      99%
+ Pop1    xx      xx
+ Pop2    xx      xx
+```
+
+`attributes(results)$allele_freqs` -- the posterior estimates of the allele frequencies for the populations, as a list, where each element of the list corresponds to one locus (and the list elements are named with the loci names), and at a single locus the allele frequencies are given as a matrix with the allele type names as the columns and the reference populations as the rows e.g. one locus example
+```
+$TR3G2
+        150    158    168    172    176    180    184    188
+ Pop1  0.125  0.125 12.125 26.125 22.125 12.125 18.125  2.125
+ Pop2  1.125  2.125 13.125 29.125 21.125 10.125 14.125  4.125
+```
+These are allele COUNT estimates, NOT PROPORTION estimates, so they do not need to add up to 1.
+
+`attributes(results)$allpopnames` -- a vector of refpopnames, followed by include.pops names i.e. `allpopnames <- c(refpopnames, include.pops)`
+
+`attributes(results)$refpopnames` -- vector of reference population names
+
+`attributes(results)$include.pops` -- vector of included pop names for assignment
+
+`attributes(results)$saddlepoint` -- TRUE/FALSE for whether saddlepoint was used
+
+`attributes(results)$leave.one.out` -- TRUE/FALSE for whether leave.one.out was used
+
+`attributes(results)$logten` -- TRUE/FALSE for whether log_10 was used (TRUE) or log_e was used (FALSE)
+
+`attributes(results)$prior` -- "Rannala"/"Baudouin", for whether Rannala and Mountain (1997) or Baudouin and Lebrun (1999) prior was used (see McMillan & Fewster (2017) for details.)
+
+## References
+
+McMillan, L. and Fewster, R. "Visualizations for genetic assignment analyses using the saddlepoint approximation method" (2017) *Biometrics*.
+
+Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus genotypes. *Proceedings of the National Academy of Sciences* **94**, 9197--9201.
+
+Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and Estoup, A. (2004). GENECLASS2: A software for genetic assignment and first-generation migrant detection. *Journal of Heredity* **95**, 536--539.

@@ -1,0 +1,20 @@
+citHeader("To cite geneplot in publications use:")
+
+citEntry(entry = "Article",
+  title        = "Visualizations for genetic assignment analyses using the saddlepoint approximation method",
+  author       = personList(as.person("McMillan, L. F."),
+                   as.person("Fewster, R. M.")),
+  journal      = "Biometrics",
+  year         = "2017",
+  volume       = "73",
+  number       = "3",
+  pages        = "1029--1041",
+  doi = "10.1111/biom.12667",
+  url          = "https://onlinelibrary.wiley.com/doi/abs/10.1111/biom.12667",
+  abstract = "We propose a method for visualizing genetic assignment data by characterizing the distribution of genetic profiles for each candidate source population. This method enhances the assignment method of Rannala and Mountain (1997) by calculating appropriate graph positions for individuals for which some genetic data are missing. An individual with missing data is positioned in the distributions of genetic profiles for a population according to its estimated quantile based on its available data. The quantiles of the genetic profile distribution for each population are calculated by approximating the cumulative distribution function (CDF) using the saddlepoint method, and then inverting the CDF to get the quantile function. The saddlepoint method also provides a way to visualize assignment results calculated using the leave-one-out procedure. This new method offers an advance upon assignment software such as geneclass2, which provides no visualization method, and is biologically more interpretable than the bar charts provided by the software structure. We show results from simulated data and apply the methods to microsatellite genotype data from ship rats (Rattus rattus) captured on the Great Barrier Island archipelago, New Zealand. The visualization method makes it straightforward to detect features of population structure and to judge the discriminative power of the genetic data for assigning individuals to source populations.",
+  textVersion  =
+  paste("McMillan and Fewster (2017).",
+        "Visualizations for genetic assignment analyses using the saddlepoint approximation method.",
+        "Biometrics, 73(3), 1029--1041.",
+        "URL https://onlinelibrary.wiley.com/doi/abs/10.1111/biom.12667.")
+)

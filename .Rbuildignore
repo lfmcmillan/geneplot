@@ -1,0 +1,8 @@
+^README\.Rmd$
+^Meta$
+^doc$
+^.*\.Rproj$
+^\.Rproj\.user$
+cran-comments.md
+PackageBuildingNotes.txt
+PackageGithubNotes.txt

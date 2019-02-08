@@ -1,0 +1,33 @@
+---
+title: "Vignette Title"
+author: "Vignette Author"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width=5, fig.height=5)
+
+library(geneplot)
+```
+
+```{r, include=FALSE}
+library(knitr)
+opts_knit$set(global.par = TRUE) ## Set package option for knitr -- this is NOT the same as changing the chunk options like we did above with opts_chunk$set
+```
+
+```{r, include=FALSE}
+par(mar=c(3,3,0.75,0.75),mgp=c(2,0.7,0)) # set narrower plot margins (must be in a separate chunk to the calls to plot, because of the way the global.par option works in knitr)
+``` 
+
+This is a vignette describing how to convert Genepop-format files into the format required by `geneplot`. 
+
+Here is an example of code that would import a file in Genepop format, using 3 digits per allele and specifying the population names using the pop_names input. After importing the Genepop-format data, the data and the names of the loci must be passed separately into the `geneplot` function.
+
+```{r, eval = FALSE}
+genepopData <- read_genepop_format(file="C:/Users/me/Documents/myfile.gen", digits_per_allele=3, pop_names=c("PopA","PopB","PopC"))
+```
