@@ -430,7 +430,7 @@ geneplot(dat=ratData2,refpopnames=c("KaiMain","Brok"),locnames=ratLocnames,
 
 \donttest{
 ## Example code for reading in a Genepop-format file
-  genepopDat <- read_genepop_format("/home/data/genepop_format_example.gen",digitsPerAllele=3)
+  genepopDat <- read_genepop_format("/home/data/genepop_format_example.gen",digits_per_allele=3)
   ## Extract the loci names (that were read in from the top of the file):
   locnames <- genepopDat$locnames
   ## Separate out the data:
