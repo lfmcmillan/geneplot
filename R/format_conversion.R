@@ -62,7 +62,7 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
     currentLine <- 1
     while (length(line <- readLines(con, n = 1, warn = FALSE)) > 0)
     {
-        if (trim(tolower(line)) == 'pop') {
+        if (trimws(tolower(line)) == 'pop') {
             if (is.na(locEndLine)) locEndLine <- currentLine-1
             popStartLines <- c(popStartLines,currentLine+1)
         }
@@ -75,15 +75,15 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
         ## If loci are a single comma-separated line, read in accordingly, but
         ## can't replace failed reading with artificial locus names because don't
         ## know how many loci there are if there was an error reading them in
-        rawLocnames <- read.table(filePath,header=FALSE,sep=",",skip=locStartLine-1,nrows=1,colClasses="character")
+        rawLocnames <- read.table(file_path,header=FALSE,sep=",",skip=locStartLine-1,nrows=1,colClasses="character")
         nloci <- ncol(rawLocnames)
     } else {
         nloci <- locEndLine-locStartLine+1
         rawLocnames <- tryCatch({
-            read.table(filePath,header=FALSE,sep="",skip=locStartLine-1,nrows=nloci,colClasses="character")
+            read.table(file_path,header=FALSE,sep="",skip=locStartLine-1,nrows=nloci,colClasses="character")
         }, error = function(err) { return(paste0("loc-",1:nloci)) })
     }
-    locnames <- unlist(rawLocnames)
+    locnames <- trimws(unlist(rawLocnames))
     names(locnames) <- NULL
 
     ### Read allelic data pop by pop
