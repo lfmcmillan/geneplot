@@ -120,7 +120,7 @@
 #' ## called Pop1, Pop2 etc. unless the individuals in that pop have non-unique
 #' ## names, in which case they will be given the ID of the first individual
 #' ## in that pop as their pop name and will be given auto-generated unique IDs.
-#' geneplot(dat, refpopnames=c("Mahu","Taik"), include.pops=c("Flat"), locnames=genepopDat$locnames)
+#' geneplot(dat, refpopnames=c("Mahu","Taik"), includepopnames=c("Flat"), locnames=genepopDat$locnames)
 #'
 #' @references McMillan, L. and Fewster, R. "Visualizations for genetic assignment
 #'  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
