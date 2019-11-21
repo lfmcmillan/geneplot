@@ -71,10 +71,18 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
     close(con)
 
     ### Read loci names
-    nloci <- locEndLine-locStartLine+1
-    rawLocnames <- tryCatch({
-        read.table(file_path,header=FALSE,sep="",skip=locStartLine-1,nrows=nloci,colClasses="character")
+    if (locEndLine == locStartLine) {
+        ## If loci are a single comma-separated line, read in accordingly, but
+        ## can't replace failed reading with artificial locus names because don't
+        ## know how many loci there are if there was an error reading them in
+        rawLocnames <- read.table(filePath,header=FALSE,sep=",",skip=locStartLine-1,nrows=1,colClasses="character")
+        nloci <- ncol(rawLocnames)
+    } else {
+        nloci <- locEndLine-locStartLine+1
+        rawLocnames <- tryCatch({
+            read.table(filePath,header=FALSE,sep="",skip=locStartLine-1,nrows=nloci,colClasses="character")
         }, error = function(err) { return(paste0("loc-",1:nloci)) })
+    }
     locnames <- unlist(rawLocnames)
     names(locnames) <- NULL
 

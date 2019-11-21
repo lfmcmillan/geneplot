@@ -1,6 +1,6 @@
 ---
-title: "Vignette Title"
-author: "Vignette Author"
+title: "Importing Genepop-format Data into GenePlot"
+author: "Louise McMillan"
 date: "`r Sys.Date()`"
 output: rmarkdown::html_vignette
 vignette: >
