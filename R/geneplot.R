@@ -114,7 +114,7 @@
 #' ## Extract the loci names (that were read in from the top of the file):
 #' locnames <- genepopDat$locnames
 #' ## Separate out the data:
-#' dat <- genepopDat$popData
+#' dat <- genepopDat$pop_data
 #' ## You could then run GenePlot on the data and locnames.
 #' ## Note that by default, data read in from Genepop format will have populations
 #' ## called Pop1, Pop2 etc. unless the individuals in that pop have non-unique
