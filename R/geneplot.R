@@ -104,20 +104,23 @@
 #'          axis_labels=c("Log10 genotype probability for Kaikoura and Mainland",
 #'                        "Log10 Genotype probability for Broken Islands"))
 #'
-#' \donttest{
 #' ## Example code for reading in a Genepop-format file
-#'   genepopDat <- read_genepop_format("/home/data/genepop_format_example.gen",digits_per_allele=3)
-#'   ## Extract the loci names (that were read in from the top of the file):
-#'   locnames <- genepopDat$locnames
-#'   ## Separate out the data:
-#'   dat <- genepopDat$popData
-#'   ## You could then run GenePlot on the data and locnames.
-#'   ## Note that by default, data read in from Genepop format will have populations
-#'   ## called Pop1, Pop2 etc. unless the individuals in that pop have non-unique
-#'   ## names, in which case they will be given the ID of the first individual
-#'   ## in that pop as their pop name and will be given auto-generated unique IDs.
-#'   geneplot(dat, refpopnames=c("Mahu","Taik"), include.pops=c("Flat"), locnames=genepopDat$locnames)
-#' }
+#' ## Typical code to run locally on your home machine:
+#' ## genepopDat <- read_genepop_format("/home/data/genepop_format_example.gen",digitsPerAllele=3)
+#' ## Working code to demonstrate the example, using a file in the package:
+#' genepopDat <- read_genepop_format(system.file("extdata",
+#'     "genepop_format_example.gen", package = "geneplot"),digitsPerAllele=3)
+#'
+#' ## Extract the loci names (that were read in from the top of the file):
+#' locnames <- genepopDat$locnames
+#' ## Separate out the data:
+#' dat <- genepopDat$popData
+#' ## You could then run GenePlot on the data and locnames.
+#' ## Note that by default, data read in from Genepop format will have populations
+#' ## called Pop1, Pop2 etc. unless the individuals in that pop have non-unique
+#' ## names, in which case they will be given the ID of the first individual
+#' ## in that pop as their pop name and will be given auto-generated unique IDs.
+#' geneplot(dat, refpopnames=c("Mahu","Taik"), include.pops=c("Flat"), locnames=genepopDat$locnames)
 #'
 #' @references McMillan, L. and Fewster, R. "Visualizations for genetic assignment
 #'  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
