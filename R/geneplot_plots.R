@@ -191,7 +191,11 @@ plot_logprob <- function(logprob_results,
     }
     else shapevec <- shapevec.default
 
-    colvec.default <- grDevices::rainbow(npop, s=0.5, start=0.625, end=0.42)
+    ## Note: using the RColorBrewer brewer.pal() function NOT the grDevices
+    ## palette() function because the latter only has 10 colours in the "Paired"
+    ## palette so loops in sync with the 5 default shapes, whereas the original
+    ## RColorBrewer "Paired" palette has 12 colours
+    colvec.default <- rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop]
     ## If some colours are supplied then colvec has length npop, otherwise colvec=NA (length 1)
     if(length(colvec)>1) colvec[is.na(colvec)] <- colvec.default[is.na(colvec)]
     else colvec <- colvec.default
@@ -309,7 +313,7 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
     ## Sort out colours if plotting points.  Any populations that have pch between
     ## 21 and 25 should have rimvec set to 1 for the rim:
     rimvec <- colvec
-    if(txt=="points" | txt=="id") rimvec[21 <= shapevec & shapevec <= 25] <- 1
+    if(txt=="points" | txt=="id") rimvec[21 <= shapevec & shapevec <= 25] <- "black"
 
     plot_single_pop <- function(whichpop){
         ## Plot results for a single population.  If whichpop=1 then plot the
@@ -341,10 +345,10 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
         if (grayscale_quantiles)
         {
             axis(side=3, at=quantile_mat[refpopnames[1],], labels=colnames(quantile_mat),
-                 col.axis="black", tick=F, cex.axis=0.75, line=-0.8)
+                 col.axis="black", tick=F, cex.axis=1, line=-0.8)
             abline(v=quantile_mat[refpopnames[1],], col="black", lty=2, lwd=1.5)
             axis(side=4, at=quantile_mat[refpopnames[2],], labels=colnames(quantile_mat),
-                 col.axis="black", tick=F, cex.axis=0.75, line=-0.8, las=1)
+                 col.axis="black", tick=F, cex.axis=1, line=-0.8, las=1)
             abline(h=quantile_mat[refpopnames[2],], col="black", lty=2, lwd=1.5)
         }
         else
@@ -352,10 +356,10 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
             col1 <- colvec[which(allpopnames==refpopnames[1])]
             col2 <- colvec[which(allpopnames==refpopnames[2])]
             axis(side=3, at=quantile_mat[refpopnames[1],], labels=colnames(quantile_mat),
-                 col.axis=col1, tick=F, cex.axis=0.75, line=-0.8)
+                 col.axis=col1, tick=F, cex.axis=1, line=-0.8)
             abline(v=quantile_mat[refpopnames[1],], col=col1, lty=2, lwd=1.5)
             axis(side=4, at=quantile_mat[refpopnames[2],], labels=colnames(quantile_mat),
-                 col.axis=col2, tick=F, cex.axis=0.75, line=-0.8, las=1)
+                 col.axis=col2, tick=F, cex.axis=1, line=-0.8, las=1)
             abline(h=quantile_mat[refpopnames[2],], col=col2, lty=2, lwd=1.5)
         }
     }
@@ -393,7 +397,7 @@ plot_logprob_manypop <- function(logprob, refpopnames, allpopnames, txt, shapeve
     ## Sort out colours if plotting points.  Any populations that have pch between 21 and 25 should have
     ## rimvec set to 1 for the rim:
     rimvec <- colvec
-    if(txt=="points" | txt=="id") rimvec[21 <= shapevec & shapevec <= 25] <- 1
+    if(txt=="points" | txt=="id") rimvec[21 <= shapevec & shapevec <= 25] <- "black"
 
     plot_single_pop <- function(whichpop){
         ## Plot results for a single population.  If whichpop=1 then plot the first population in

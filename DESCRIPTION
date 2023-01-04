@@ -23,5 +23,6 @@ VignetteBuilder: knitr
 Imports: 
     grDevices,
     graphics,
+    RColorBrewer,
     stats,
     utils
