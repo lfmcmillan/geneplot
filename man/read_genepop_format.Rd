@@ -4,8 +4,13 @@
 \alias{read_genepop_format}
 \title{Reading data from Genepop.}
 \usage{
-read_genepop_format(file_path, header = TRUE, diploid = TRUE,
-  digits_per_allele = 2, pop_names = NULL)
+read_genepop_format(
+  file_path,
+  header = TRUE,
+  diploid = TRUE,
+  digits_per_allele = 2,
+  pop_names = NULL
+)
 }
 \arguments{
 \item{file_path}{String definining path of the file to read, which can have any

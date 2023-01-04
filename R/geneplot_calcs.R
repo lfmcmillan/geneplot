@@ -160,19 +160,19 @@
 #' the results are attached as attributes to the results object.
 #' If your call to \code{calc_logprob} or \code{geneplot} is e.g.
 #'
-#'      \code{Pop1_vs_Pop2_results <- calc.logprob.func(dat, c("Pop1","Pop2"), locnames=whaleLocnames)}
+#'      \code{Pop1_vs_Pop2_results <- calc_logprob(dat, c("Pop1","Pop2"), locnames=whaleLocnames)}
 #'
 #'  then you would find out the attributes using \code{attributes(Pop1_vs_Pop2_results)$saddlepoint} etc.
 #'
 #' Other attributes attached to the results object are:
-#'      \code{attributes(results)$min.loci} -- the minimum number of loci to require
+#'      \code{attributes(results)$min_loci} -- the minimum number of loci to require
 #'          for any individual to be assigned, so any individual with fewer loci
 #'          will be excluded from analysis
 #'
-#'      \code{attributes(results)$n.too.few} -- the number of individuals that have
+#'      \code{attributes(results)$n_too_few} -- the number of individuals that have
 #'          been excluded from the analysis because they had too few loci
 #'
-#'      \code{attributes(results)$percent.missing} -- the percentage of individuals
+#'      \code{attributes(results)$percent_missing} -- the percentage of individuals
 #'          that have been excluded, out of all those in the samples listed in
 #'          allpopnames
 #'
@@ -203,16 +203,16 @@
 #'          These are allele COUNT estimates, NOT PROPORTION estimates, so
 #'          they do not need to add up to 1.
 #'
-#'      \code{attributes(results)$allpopnames} -- a vector of refpopnames, followed by include.pops names
-#'          i.e. allpopnames <- c(refpopnames, include.pops)
+#'      \code{attributes(results)$allpopnames} -- a vector of refpopnames, followed by includepopnames
+#'          i.e. allpopnames <- c(refpopnames, includepopnames)
 #'
 #'      \code{attributes(results)$refpopnames} -- vector of reference population names
 #'
-#'      \code{attributes(results)$include.pops} -- vector of included pop names for assignment
+#'      \code{attributes(results)$includepopnames} -- vector of included pop names for assignment
 #'
 #'      \code{attributes(results)$saddlepoint} -- TRUE/FALSE for whether saddlepoint was used
 #'
-#'      \code{attributes(results)$leave.one.out} -- TRUE/FALSE for whether leave.one.out was used
+#'      \code{attributes(results)$leave_one_out} -- TRUE/FALSE for whether leave_one_out was used
 #'
 #'      \code{attributes(results)$logten} -- TRUE/FALSE for whether log_10 was used (TRUE) or
 #'          log_e was used (FALSE)

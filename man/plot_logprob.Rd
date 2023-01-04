@@ -4,14 +4,27 @@
 \alias{plot_logprob}
 \title{Produce GenePlots of the results from \code{\link{calc_logprob}}.}
 \usage{
-plot_logprob(logprob_results,
-  plot_type = switch(as.character(length(refpopnames)), `2` = "twopop",
-  "manypop"), plot_bars = F, colvec = NA, shapevec = NA,
-  mark_impute = F, txt = "points", use_legend = T,
-  legend_pos = "bottomleft", xyrange = NULL, orderpop = NULL,
-  axispop = NULL, axis_labels = NULL, short_axis_labels = F,
-  grayscale_quantiles = F, dim1 = 1, dim2 = 2,
-  layout_already_set = F, cexpts = 1.4)
+plot_logprob(
+  logprob_results,
+  plot_type = switch(as.character(length(refpopnames)), `2` = "twopop", "manypop"),
+  plot_bars = F,
+  colvec = NA,
+  shapevec = NA,
+  mark_impute = F,
+  txt = "points",
+  use_legend = T,
+  legend_pos = "bottomleft",
+  xyrange = NULL,
+  orderpop = NULL,
+  axispop = NULL,
+  axis_labels = NULL,
+  short_axis_labels = F,
+  grayscale_quantiles = F,
+  dim1 = 1,
+  dim2 = 2,
+  layout_already_set = F,
+  cexpts = 1.4
+)
 }
 \arguments{
 \item{logprob_results}{A data frame containing the results of the GenePlot

@@ -287,16 +287,16 @@ The individuals in one of the reference populations are ordered according to the
 ## Results object attributes
 
 At the end of `calc_logprob` or `geneplot` the details of the algorithm used to calculate the results are attached as `attributes` to the results object. If your call to GenePlot is e.g.
-      `Pop1_vs_Pop2_results <- calc.logprob.func(ratData, c("Pop1","Pop2"), locnames=ratLocnames)`
+      `Pop1_vs_Pop2_results <- calc_logprob(ratData, c("Pop1","Pop2"), locnames=ratLocnames)`
 then you would find out the attributes using `attributes(Pop1_vs_Pop2_results)$saddlepoint etc.
 
 Other attributes attached to the results object are:
 
-`attributes(results)$min.loci` -- the minimum number of loci to require for any individual to be assigned, so any individual with fewer loci will be excluded from analysis
+`attributes(results)$min_loci` -- the minimum number of loci to require for any individual to be assigned, so any individual with fewer loci will be excluded from analysis
       
-`attributes(results)$n.too.few` -- the number of individuals that have been excluded from the analysis because they had too few loci
+`attributes(results)$n_too_few` -- the number of individuals that have been excluded from the analysis because they had too few loci
       
-`attributes(results)$percent.missing` -- the percentage of individuals that have been excluded, out of all those in the samples listed in `allpopnames`
+`attributes(results)$percent_missing` -- the percentage of individuals that have been excluded, out of all those in the samples listed in `allpopnames`
       
 `attributes(results)$qmat` -- the values of the plotted quantiles for the populations, with the % labels of the quantiles as the column names e.g. if quantiles=c(0.05,0.99) was the input to chart.func then qmat will be of the form
 ```
@@ -318,11 +318,11 @@ These are allele COUNT estimates, NOT PROPORTION estimates, so they do not need 
 
 `attributes(results)$refpopnames` -- vector of reference population names
 
-`attributes(results)$include.pops` -- vector of included pop names for assignment
+`attributes(results)$includepopnames` -- vector of included pop names for assignment
 
 `attributes(results)$saddlepoint` -- TRUE/FALSE for whether saddlepoint was used
 
-`attributes(results)$leave.one.out` -- TRUE/FALSE for whether leave.one.out was used
+`attributes(results)$leave_one_out` -- TRUE/FALSE for whether leave_one_out was used
 
 `attributes(results)$logten` -- TRUE/FALSE for whether log_10 was used (TRUE) or log_e was used (FALSE)
 
