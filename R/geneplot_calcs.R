@@ -684,28 +684,6 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
 
     if (leave_one_out && indiv_dat$pop %in% refpopnames) ## If doing leave-one-out, impute individual LGP for its own population
     {
-        # if (saddlepoint)
-        # {
-        #     post.nu.pop <- lapply(LOO.posterior_nu_list, function(x) x[individual.dat$pop,]) ## Note: have to use "lapply" to preserve correct format!
-        #     post.info <- calc.multi.locus.probs.func(post.nu.pop)
-        #     multi.K.params <- make.K.params(post.info$dist)
-        #     mean.pop <- mu(multi.K.params)
-        #
-        #     indiv_p <- Fhat(log_indiv_probvec[indiv_dat$pop], post.info, mean.pop, logten=logten)
-        #
-        #     if (is.na(indiv_p))
-        #     {
-        #         print("indiv_p is NA")
-        #         test <- Fhat(log_indiv_probvec[,indiv_dat$pop], post.info, mean.pop, logten=logten)
-        #     }
-        #
-        #     if (is.infinite(indiv_p))
-        #     {
-        #         print("indiv_p is infinite")
-        #         test <- Fhat(log_indiv_probvec[,indiv_dat$pop], post.info, mean.pop, logten=logten)
-        #     }
-        # }
-        # else
         if (!saddlepoint)
         {
             if (is.null(all_loci_sim_logprob)) stop("all_loci_sim_logprob cannot be null when using non-saddlepoint Ndraw method.")
@@ -716,16 +694,6 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
             indiv_p <- length((1:Ndraw)[all_loci_sim_logprob[indiv_dat$pop,] <= log_indiv_probvec[indiv_dat$pop]])/Ndraw
         }
 
-        ###### Here, use Qhat for the full SCDF
-        # if (saddlepoint)
-        # {
-        #     if (is.null(all_loci_SCDF_qsearch_params)) stop("all_loci_SCDF_qsearch_params cannot be null when using saddlepoint.")
-        #
-        #     #print("Starting to calculate the quantiles for a single population")
-        #     q <- calc.quantiles.uniroot(all_loci_SCDF_qsearch_params, posterior_nu_list, indiv_dat$pop, indiv_p, logten=logten)
-        #     #print("Calculated the quantiles for a single population")
-        # }
-        # else
         if (!saddlepoint)
         {
             ## The result is the p-value for each reference pop:
