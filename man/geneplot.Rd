@@ -146,8 +146,8 @@ to calc_logprob.}
 
 \item{plot_type}{(default NULL) Can be used to specify "twopop" or "manypop"
 plots. Defaults to "twopop" for 2 reference pops (i.e. 2 pops listed in
-\code{refpopnames} in the call to \code{\link{geneplot}} or \code{\link{calc_logprob}})
-and "manypop" for >2 reference pops.}
+\code{refpopnames} in the call to \code{\link{geneplot}} or
+\code{\link{calc_logprob}}) and "manypop" for >2 reference pops.}
 
 \item{plot_bars}{(default FALSE) Specify what type of plot to use for >2
 reference populations.
@@ -161,12 +161,12 @@ to their Log-Genotype-Probability with respect to their own pop, and that
 ordering is then used to display them in all the other bar plots as well,
 so that all the bar plots show the individuals in the same order.}
 
-\item{colvec}{(default=grDevices::rainbow(npop, s=0.5, start=0.625, end=0.42)) Vector
-of colours for plotting. The colours correspond to populations
-specified in the order of \code{c(refpopnames, includepopnames)}. Thus the
-first element of colvec corresponds to the first element of \code{refpopnames};
-the last element of colvec corresponds to the last element of
-\code{includepopnames}.
+\item{colvec}{(default=rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop])
+Vector of colours for plotting. The colours correspond to populations
+specified in the order of \code{c(refpopnames, includepopnames)}. Thus
+the first element of colvec corresponds to the first element of
+\code{refpopnames}; the last element of colvec corresponds to the last
+element of \code{includepopnames}.
 Colours can be specified using rgb objects, hexadecimal codes, or any of
 the R colour names (see \url{http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf}
 for a PDF of R colours).}
@@ -181,21 +181,22 @@ which correspond to the following pch values for R plots:
 Do not use the numbers, use the words, which will be automatically
 converted within plot_logprob into the appropriate codes.
 The elements of shapevec correspond to the populations specified in the
-order of \code{c(refpopnames, includepopnames)}. Thus the first element of
-shapevec corresponds to the first element of \code{refpopnames}; the last
-element of shapevec corresponds to the last element of \code{includepopnames}.
+order of \code{c(refpopnames, includepopnames)}. Thus the first element
+of shapevec corresponds to the first element of \code{refpopnames}; the
+last element of shapevec corresponds to the last element of
+\code{includepopnames}.
 Defaults to the list above, looping through as many times as required for
 all the populations.}
 
 \item{mark_impute}{(default FALSE) Boolean, indicates whether to mark
 individuals with missing data using asterisks.}
 
-\item{txt}{(default "points") Defines whether to plot individuals as points on
-the GenePlot (\code{"points"}), or whether to display the name of their
-population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID (\code{"id"})
-as text. For \code{"subpop"}, must have 'subpop' as one of the columns in
-the \code{dat} input to calc_logprob. Then 'subpop' will automatically be
-included in the \code{logprob_results} object.}
+\item{txt}{(default "points") Defines whether to plot individuals as points
+on the GenePlot (\code{"points"}), or whether to display the name of
+their population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID
+(\code{"id"}) as text. For \code{"subpop"}, must have 'subpop' as one of
+the columns in the \code{dat} input to calc_logprob. Then 'subpop' will
+automatically be included in the \code{logprob_results} object.}
 
 \item{use_legend}{(default TRUE) Plot the legend (or FALSE for don't plot the legend).}
 
@@ -264,7 +265,8 @@ The first two columns are "id" and "pop", as in the input data.
 The next column (col3) is "status" which is "complete" or "impute" depending on
 whether the individual had data for all loci, or had some loci missing.
 
-The next column (col4) is "nloci" which is how many loci the individual has data for
+The next column (col4) is "nloci" which is how many loci the individual has
+data for
 
 The next columns are the final/imputed log-genotype probabilities for the
 individual with respect to each of the reference populations.
@@ -281,10 +283,10 @@ probabilities with respect to each of the reference populations.
 
 For individuals with missing data at some loci then the raw values are the
 log-genotype probabilities calculated based on the loci that *are* present in
-the data, and the final/imputed columns, at the start of the results data frame,
-are the imputed log-genotype probabilities for the full set of loci i.e.
-the final LGPs for the missing-data individuals are comparable to the final LGPs
-for the complete-data individuals.
+the data, and the final/imputed columns, at the start of the results data
+frame, are the imputed log-genotype probabilities for the full set of loci
+i.e. the final LGPs for the missing-data individuals are comparable to the
+final LGPs for the complete-data individuals.
 
 ---- Additional attributes of the results object ----------------------------
 
@@ -318,13 +320,12 @@ Other attributes attached to the results object are:
          Pop1 \tab xx \tab xx\cr
          Pop2 \tab xx \tab xx}
 
-     \code{attributes(results)$allele_freqs} -- the posterior estimates of the allele
-         frequencies for the populations, as a list, where each element of the
-         list corresponds to one locus (and the list elements are named with
-         the loci names), and at a single locus the allele
-         frequencies are given as a matrix with the allele type names as the
-         columns and the reference populations as the rows
-         e.g. one locus example
+     \code{attributes(results)$allele_freqs} -- the posterior estimates of the
+         allele frequencies for the populations, as a list, where each element
+         of the list corresponds to one locus (and the list elements are named
+         with the loci names), and at a single locus the allele frequencies are
+         given as a matrix with the allele type names as the columns and the
+         reference populations as the rows e.g. one locus example:
 
          \code{$TR3G2}
          \tabular{lrrrrrr}{

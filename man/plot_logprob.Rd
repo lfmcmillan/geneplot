@@ -33,8 +33,8 @@ calculations, as obtained by running \code{\link{geneplot}} or
 
 \item{plot_type}{(default NULL) Can be used to specify "twopop" or "manypop"
 plots. Defaults to "twopop" for 2 reference pops (i.e. 2 pops listed in
-\code{refpopnames} in the call to \code{\link{geneplot}} or \code{\link{calc_logprob}})
-and "manypop" for >2 reference pops.}
+\code{refpopnames} in the call to \code{\link{geneplot}} or
+\code{\link{calc_logprob}}) and "manypop" for >2 reference pops.}
 
 \item{plot_bars}{(default FALSE) Specify what type of plot to use for >2
 reference populations.
@@ -48,12 +48,12 @@ to their Log-Genotype-Probability with respect to their own pop, and that
 ordering is then used to display them in all the other bar plots as well,
 so that all the bar plots show the individuals in the same order.}
 
-\item{colvec}{(default=grDevices::rainbow(npop, s=0.5, start=0.625, end=0.42)) Vector
-of colours for plotting. The colours correspond to populations
-specified in the order of \code{c(refpopnames, includepopnames)}. Thus the
-first element of colvec corresponds to the first element of \code{refpopnames};
-the last element of colvec corresponds to the last element of
-\code{includepopnames}.
+\item{colvec}{(default=rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop])
+Vector of colours for plotting. The colours correspond to populations
+specified in the order of \code{c(refpopnames, includepopnames)}. Thus
+the first element of colvec corresponds to the first element of
+\code{refpopnames}; the last element of colvec corresponds to the last
+element of \code{includepopnames}.
 Colours can be specified using rgb objects, hexadecimal codes, or any of
 the R colour names (see \url{http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf}
 for a PDF of R colours).}
@@ -68,21 +68,22 @@ which correspond to the following pch values for R plots:
 Do not use the numbers, use the words, which will be automatically
 converted within plot_logprob into the appropriate codes.
 The elements of shapevec correspond to the populations specified in the
-order of \code{c(refpopnames, includepopnames)}. Thus the first element of
-shapevec corresponds to the first element of \code{refpopnames}; the last
-element of shapevec corresponds to the last element of \code{includepopnames}.
+order of \code{c(refpopnames, includepopnames)}. Thus the first element
+of shapevec corresponds to the first element of \code{refpopnames}; the
+last element of shapevec corresponds to the last element of
+\code{includepopnames}.
 Defaults to the list above, looping through as many times as required for
 all the populations.}
 
 \item{mark_impute}{(default FALSE) Boolean, indicates whether to mark
 individuals with missing data using asterisks.}
 
-\item{txt}{(default "points") Defines whether to plot individuals as points on
-the GenePlot (\code{"points"}), or whether to display the name of their
-population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID (\code{"id"})
-as text. For \code{"subpop"}, must have 'subpop' as one of the columns in
-the \code{dat} input to calc_logprob. Then 'subpop' will automatically be
-included in the \code{logprob_results} object.}
+\item{txt}{(default "points") Defines whether to plot individuals as points
+on the GenePlot (\code{"points"}), or whether to display the name of
+their population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID
+(\code{"id"}) as text. For \code{"subpop"}, must have 'subpop' as one of
+the columns in the \code{dat} input to calc_logprob. Then 'subpop' will
+automatically be included in the \code{logprob_results} object.}
 
 \item{use_legend}{(default TRUE) Plot the legend (or FALSE for don't plot the legend).}
 
@@ -146,17 +147,23 @@ command has been called earlier). TRUE prevents the layout command within
 Displays the plot.
 }
 \description{
-Produce GenePlots of the results obtained from running \code{\link{calc_logprob}}, or replot
-the results obtained from running \code{\link{geneplot}}.
+Produce GenePlots of the results obtained from running
+\code{\link{calc_logprob}}, or replot the results obtained from running
+\code{\link{geneplot}}.
 }
 \references{
-McMillan, L. and Fewster, R. "Visualizations for genetic assignment
- analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
- Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
- genotypes. \emph{Proceedings of the National Academy of Sciences} \strong{94}, 9197--9201.
- Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
- Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
- first-generation migrant detection. \emph{Journal of Heredity} \strong{95}, 536--539.
+McMillan, L. and Fewster, R. "Visualizations for genetic
+  assignment analyses using the saddlepoint approximation method" (2017)
+  \emph{Biometrics}.
+
+  Rannala, B., and Mountain, J. L. (1997). Detecting
+  immigration by using multilocus genotypes. \emph{Proceedings of the
+  National Academy of Sciences} \strong{94}, 9197--9201.
+
+  Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
+  first-generation migrant detection. \emph{Journal of Heredity} \strong{95},
+  536--539.
 }
 \author{
 Log-Genotype-Probability calculations based on the method of Rannala

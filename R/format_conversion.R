@@ -180,49 +180,61 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
     list(pop_data=pop_data,locnames=locnames)
 }
 
-writeGenepopFormat <- function(dat, outfile, locnames.all, delete.loc=NULL, min.loci.per.indiv=1){
+write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, min_loci_per_indiv=1){
     ## genepop.dataformat.func 9/5/12
-    ## The output from this function is ready for sending to any Genepop-format application.
-    ## The input data (dat) has missing code 0. It uses 2 digits per allele, and works only for diploid data.
+    ## The output from this function is ready for sending to any Genepop-format
+    ## application.
+    ## The input data (dat) has missing code 0. It uses 2 digits per allele, and
+    ## works only for diploid data.
     ##
-    ## To remove specific loci from the analysis, it's easiest to keep locnames.all as the full list of loci,
-    ## and specify which loci should be removed using delete.loc : e.g. delete.loc = c(1, 2) will
-    ## remove the first two of the loci named in locnames.all.
-    ## The primary purpose of argument locnames.all is to allow different loci sets for different species, e.g.
-    ## might want to use locnames.all = locnames.rat or locnames.all = locnames.stoat.
+    ## To remove specific loci from the analysis, it's easiest to keep
+    ## locnames_all as the full list of loci, and specify which loci should be
+    ## removed using delete_loc : e.g. delete_loc = c(1, 2) will remove the
+    ## first two of the loci named in locnames_all.
+    ## The primary purpose of argument locnames_all is to allow different loci
+    ## sets for different species, e.g. might want to use locnames_all =
+    ## locnames_rat or locnames_all = locnames_stoat.
     ##
-    ## If delete.loc=NULL, no loci are removed.
+    ## If delete_loc=NULL, no loci are removed.
     ##
     ## For Genepop format, the alleles are numbered as follows, within each locus.
     ## 00 = missing code
     ## 01, 02, 03, ...  alleles sampled at the locus.
-    ## Information about the allele label is lost, e.g. an individual with genotype 96, 102 might become
-    ## 0103 under this scheme, meaning that allele 96 is given label 01, and allele 102 is given label 03.
-    ## The order of labels 01, 02, etc follows the order dictated by the R function table().
+    ## Information about the allele label is lost, e.g. an individual with
+    ## genotype 96, 102 might become 0103 under this scheme, meaning that allele
+    ## 96 is given label 01, and allele 102 is given label 03.
+    ## The order of labels 01, 02, etc follows the order dictated by the R
+    ## function table().
     ##
-    ## This function assumes a maximum of 99 alleles at any single locus, which will be labelled 00 (missing code),
-    ## 01, 02, ..., 99.  If there are more than 99 alleles at a locus, the code needs to be updated to 3-digit format
-    ## by adding extra leading zeros: 001, 002, ..., 099.
+    ## This function assumes a maximum of 99 alleles at any single locus, which
+    ## will be labelled 00 (missing code), 01, 02, ..., 99.  If there are more
+    ## than 99 alleles at a locus, the code needs to be updated to 3-digit
+    ## format by adding extra leading zeros: 001, 002, ..., 099.
     ##
     ##
     ## Minimum Loci:
     ##
-    ## This function only includes individuals with at least min.loci.per.indiv typed loci - e.g. a reasonable
-    ## minimum might be 8.  This aims to exclude altogether individuals with low-quality DNA samples.
-    ## For example, if an individual has poor-quality DNA and is typed as a homozygote at one of its
-    ## "successful" loci, it might actually be a heterozygote at that loci but the second allele failed to amplify.
+    ## This function only includes individuals with at least min_loci_per_indiv
+    ## typed loci - e.g. a reasonable minimum might be 8.  This aims to exclude
+    ## altogether individuals with low-quality DNA samples.
+    ## For example, if an individual has poor-quality DNA and is typed as a
+    ## homozygote at one of its "successful" loci, it might actually be a
+    ## heterozygote at that loci but the second allele failed to amplify.
     ##
-    ## NOTE that min.loci applies to the FULL data from locnames.all: so if an individual has 8 present loci out of 10,
-    ## it counts as 8 for purposes of exclusion, even if only (say) 5 of these coincide with the actual loci of interest after
-    ## delete.loc have been deleted.  The rationale is that this is an individual with reasonable data quality,
-    ## evidenced by 8 out of 10 successful loci.
+    ## NOTE that min.loci applies to the FULL data from locnames_all: so if an
+    ## individual has 8 present loci out of 10, it counts as 8 for purposes of
+    ## exclusion, even if only (say) 5 of these coincide with the actual loci of
+    ## interest after delete_loc have been deleted.  The rationale is that this
+    ## is an individual with reasonable data quality, evidenced by 8 out of 10
+    ## successful loci.
     ##
-    ## min.loci.per.indiv defaults to 1, to include all individuals with any data present.
+    ## min_loci_per_indiv defaults to 1, to include all individuals with any
+    ## data present.
     ##
     ## EXAMPLE:
-    ## The following command will prompt to accept the outfile name "genepop.gbi.dat.txt", and
-    ## write results into it:
-    ##          genepop.dataformat.func(gbi.dat, min.loci.per.indiv=8)
+    ## The following command will prompt to accept the outfile name
+    ## "genepop.gbi.dat.txt", and write results into it:
+    ##          genepop.dataformat.func(gbi.dat, min_loci_per_indiv=8)
 
 
     ##--------------------------------------------------------------------------------------------
@@ -235,92 +247,97 @@ writeGenepopFormat <- function(dat, outfile, locnames.all, delete.loc=NULL, min.
     }
 
     ##--------------------------------------------------------------------------------------------
-    ## Exclude poor-quality individuals with < min.loci.per.indiv loci from the FULL data in locnames.all:
-    if(min.loci.per.indiv>1){
-        ## Find number of non-missing loci (allele anything except 0) for each individual.
-        ## If there is missing data at a locus, the loc.a1 entry and loc.a2 entry will both be 0.
+    ## Exclude poor-quality individuals with < min_loci_per_indiv loci from the
+    ## FULL data in locnames_all:
+    if(min_loci_per_indiv>1){
+        ## Find number of non-missing loci (allele anything except 0) for each
+        ## individual.
+        ## If there is missing data at a locus, the loc.a1 entry and loc.a2
+        ## entry will both be 0.
         ## Use only the loc.a1 entry.
-        nloc.dat <- dat[, paste0(locnames.all, ".a1")]
-        nloc <- apply(nloc.dat, 1, function(x) length(x[x!=0]))
-        cat("WARNING! Excluding all individuals with <", min.loci.per.indiv,
-            " loci out of ", length(locnames.all), " loci available.\n")
+        nloc_dat <- dat[, paste0(locnames_all, ".a1")]
+        nloc <- apply(nloc_dat, 1, function(x) length(x[x!=0]))
+        cat("WARNING! Excluding all individuals with <", min_loci_per_indiv,
+            " loci out of ", length(locnames_all), " loci available.\n")
         ## Remove individuals from dat if they have too few loci:
-        dat <- dat[nloc >= min.loci.per.indiv,]
+        dat <- dat[nloc >= min_loci_per_indiv,]
     }
 
     ##--------------------------------------------------------------------------------------------
     ## Create the names of the desired loci:
-    if(is.null(delete.loc)) locnames.foruse <- locnames.all
-    else locnames.foruse <- locnames.all[-delete.loc]
+    if(is.null(delete_loc)) locnames_foruse <- locnames_all
+    else locnames_foruse <- locnames_all[-delete_loc]
 
     ##--------------------------------------------------------------------------------------------
     ## Isolate the column numbers for the required columns:
-    col.names.1 <- paste0(locnames.foruse, ".a1")
-    col.names.2 <- paste0(locnames.foruse, ".a2")
-    col.names <- sort(c(col.names.1, col.names.2))
-    dat.out <- dat[,c("id", "pop", col.names)]
+    colnames_a1 <- paste0(locnames_foruse, ".a1")
+    colnames_a2 <- paste0(locnames_foruse, ".a2")
+    colnames_locus <- sort(c(colnames_a1, colnames_a2))
+    dat_out <- dat[,c("id", "pop", colnames_locus)]
 
     ##--------------------------------------------------------------------------------------------
     ## Next order the data frame by population, so that each population
     ## occupies a block of rows in the data frame:
 
-    dat.out <- dat.out[order(dat.out$pop), ]
+    dat_out <- dat_out[order(dat_out$pop), ]
 
     ##--------------------------------------------------------------------------------------------
     ## For each locus in turn, replace the allele labels with 00 (missing), 01, 02, ...10, 11, ...
-    for(loc in locnames.foruse){
-        col.1 <- paste0(loc, ".a1")
-        col.2 <- paste0(loc, ".a2")
-        loc.1 <- dat.out[, col.1]
-        loc.2 <- dat.out[, col.2]
+    for(loc in locnames_foruse){
+        col_a1 <- paste0(loc, ".a1")
+        col_a2 <- paste0(loc, ".a2")
+        loc_a1 <- dat_out[, col_a1]
+        loc_a2 <- dat_out[, col_a2]
         ## Identify the labels of all alleles in the data for this locus:
-        locboth <- c(loc.1, loc.2)
+        locboth <- c(loc_a1, loc_a2)
         loctab <- table(locboth)
-        loctab.names <- names(loctab)
+        loctab_names <- names(loctab)
         ## Number of visible alleles (non-null):
-        n.visalleles <- length(loctab[loctab.names!="0"])
-        new.names <- as.character(1:n.visalleles)
+        n_visalleles <- length(loctab[loctab_names!="0"])
+        new_names <- as.character(1:n_visalleles)
         ## Add leading zeros:
-        new.names[1:9] <- paste("0", new.names[1:9], sep="")
-        ## Add the missing code if there are any missing data at this locus.  Missing (0) becomes 00.
-        if(any(loctab.names=="0")) new.names <- c("00", new.names)
-        ## Replace the old allele names in dat.out with the new ones:
-        for(al in 1:length(loctab.names)){
-            dat.out[,col.1][as.character(loc.1)==loctab.names[al]] <- new.names[al]
-            dat.out[,col.2][as.character(loc.2)==loctab.names[al]] <- new.names[al]
+        new_names[1:9] <- paste("0", new_names[1:9], sep="")
+        ## Add the missing code if there are any missing data at this locus.
+        ## Missing (0) becomes 00.
+        if(any(loctab_names=="0")) new_names <- c("00", new_names)
+        ## Replace the old allele names in dat_out with the new ones:
+        for(al in 1:length(loctab_names)){
+            dat_out[,col_a1][as.character(loc_a1)==loctab_names[al]] <- new_names[al]
+            dat_out[,col_a2][as.character(loc_a2)==loctab_names[al]] <- new_names[al]
         }
     }
     ## The results are now of the form 00, 01, 02, ... where the order of the new label
     ## is the same as the numeric order of the old label.
 
-    ## Now add a comma after the population name for each individual, and paste together the columns for each locus.
-    ## dat.new looks something like this:
+    ## Now add a comma after the population name for each individual, and paste
+    ## together the columns for each locus.
+    ## dat_new looks something like this:
     ## id            loc1     loc2     loc3      ...
     ## Awa,     1010    0611     0303     ...
     ## Awa,     0505    0711     0102     ...  etc.
-    # dat.new <- data.frame(id=paste0(dat.out$pop, ","))
-    dat.new <- data.frame(id=paste0(dat.out$id,","))
-    for(loc in locnames.foruse){
-        col.1 <- paste(loc, ".a1", sep="")
-        col.2 <- paste(loc, ".a2", sep="")
-        dat.new[,loc] <- paste0(dat.out[,col.1], dat.out[,col.2])
+    # dat_new <- data.frame(id=paste0(dat_out$pop, ","))
+    dat_new <- data.frame(id=paste0(dat_out$id,","))
+    for(loc in locnames_foruse){
+        col_a1 <- paste(loc, ".a1", sep="")
+        col_a2 <- paste(loc, ".a2", sep="")
+        dat_new[,loc] <- paste0(dat_out[,col_a1], dat_out[,col_a2])
     }
 
     ## Split into populations:
-    dat.split <- split(dat.new, dat.out$pop)
+    dat_split <- split(dat_new, dat_out$pop)
 
 
     ##--------------------------------------------------------------------------------------------
     ## Now write the results into outfile in the required Genepop format:
     cat(outfile, file=outfile, "\n", append=F)
-    for(ln in paste(sort(locnames.foruse))) cat(ln, "\n", file=outfile, append=T)
+    for(ln in paste(sort(locnames_foruse))) cat(ln, "\n", file=outfile, append=T)
 
-    write.func <- function(pop){
+    write_output <- function(pop){
         cat("POP\n", file=outfile, append=T)
-        write.table(pop, outfile, row.names=F, col.names=F, quote=F, sep="  ", append=T)
+        write.table(pop, outfile, row.names=F, colnames_locus=F, quote=F, sep="  ", append=T)
     }
 
-    lapply(dat.split, write.func)
+    lapply(dat_split, write_output)
     cat("\nFile", outfile, "has been created in Genepop format.\n")
     cat("Genepop On The Web is at http://genepop.curtin.edu.au/\n")
     invisible()

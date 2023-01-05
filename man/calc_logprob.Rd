@@ -129,7 +129,8 @@ The first two columns are "id" and "pop", as in the input data.
 The next column (col3) is "status" which is "complete" or "impute" depending on
 whether the individual had data for all loci, or had some loci missing.
 
-The next column (col4) is "nloci" which is how many loci the individual has data for
+The next column (col4) is "nloci" which is how many loci the individual has
+data for
 
 The next columns are the final/imputed log-genotype probabilities for the
 individual with respect to each of the reference populations.
@@ -146,10 +147,10 @@ probabilities with respect to each of the reference populations.
 
 For individuals with missing data at some loci then the raw values are the
 log-genotype probabilities calculated based on the loci that *are* present in
-the data, and the final/imputed columns, at the start of the results data frame,
-are the imputed log-genotype probabilities for the full set of loci i.e.
-the final LGPs for the missing-data individuals are comparable to the final LGPs
-for the complete-data individuals.
+the data, and the final/imputed columns, at the start of the results data
+frame, are the imputed log-genotype probabilities for the full set of loci
+i.e. the final LGPs for the missing-data individuals are comparable to the
+final LGPs for the complete-data individuals.
 
 ---- Additional attributes of the results object ----------------------------
 
@@ -183,13 +184,12 @@ Other attributes attached to the results object are:
          Pop1 \tab xx \tab xx\cr
          Pop2 \tab xx \tab xx}
 
-     \code{attributes(results)$allele_freqs} -- the posterior estimates of the allele
-         frequencies for the populations, as a list, where each element of the
-         list corresponds to one locus (and the list elements are named with
-         the loci names), and at a single locus the allele
-         frequencies are given as a matrix with the allele type names as the
-         columns and the reference populations as the rows
-         e.g. one locus example
+     \code{attributes(results)$allele_freqs} -- the posterior estimates of the
+         allele frequencies for the populations, as a list, where each element
+         of the list corresponds to one locus (and the list elements are named
+         with the loci names), and at a single locus the allele frequencies are
+         given as a matrix with the allele type names as the columns and the
+         reference populations as the rows e.g. one locus example:
 
          \code{$TR3G2}
          \tabular{lrrrrrr}{
@@ -242,18 +242,21 @@ ESPECIALLY FOR SMALL SAMPLES (<30).
 McMillan, L. and Fewster, R. "Visualizations for genetic assignment
  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
 
- Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
- genotypes. \emph{Proceedings of the National Academy of Sciences} \strong{94}, 9197--9201.
- Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+ Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using
+ multilocus genotypes. \emph{Proceedings of the National Academy of Sciences}
+ \strong{94}, 9197--9201.
 
+ Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
- first-generation migrant detection. \emph{Journal of Heredity} \strong{95}, 536--539.
+ first-generation migrant detection. \emph{Journal of Heredity} \strong{95},
+ 536--539.
 }
 \author{
 Log-Genotype-Probability calculations based on the method of Rannala
-and Mountain (1997) as implemented in GeneClass2, updated to allow for individuals
-with missing data and to enable accurate calculations of quantiles of the
-Log-Genotype-Probability distributions of the reference populations.
+  and Mountain (1997) as implemented in GeneClass2, updated to allow for
+  individuals with missing data and to enable accurate calculations of
+  quantiles of the Log-Genotype-Probability distributions of the reference
+  populations.
 See McMillan and Fewster (2017) for details.
 Coded by Rachel Fewster and Louise McMillan.
 }

@@ -132,7 +132,8 @@
 #' The next column (col3) is "status" which is "complete" or "impute" depending on
 #' whether the individual had data for all loci, or had some loci missing.
 #'
-#' The next column (col4) is "nloci" which is how many loci the individual has data for
+#' The next column (col4) is "nloci" which is how many loci the individual has
+#' data for
 #'
 #' The next columns are the final/imputed log-genotype probabilities for the
 #' individual with respect to each of the reference populations.
@@ -149,10 +150,10 @@
 #'
 #' For individuals with missing data at some loci then the raw values are the
 #' log-genotype probabilities calculated based on the loci that *are* present in
-#' the data, and the final/imputed columns, at the start of the results data frame,
-#' are the imputed log-genotype probabilities for the full set of loci i.e.
-#' the final LGPs for the missing-data individuals are comparable to the final LGPs
-#' for the complete-data individuals.
+#' the data, and the final/imputed columns, at the start of the results data
+#' frame, are the imputed log-genotype probabilities for the full set of loci
+#' i.e. the final LGPs for the missing-data individuals are comparable to the
+#' final LGPs for the complete-data individuals.
 #'
 #' ---- Additional attributes of the results object ----------------------------
 #'
@@ -186,13 +187,12 @@
 #'          Pop1 \tab xx \tab xx\cr
 #'          Pop2 \tab xx \tab xx}
 #'
-#'      \code{attributes(results)$allele_freqs} -- the posterior estimates of the allele
-#'          frequencies for the populations, as a list, where each element of the
-#'          list corresponds to one locus (and the list elements are named with
-#'          the loci names), and at a single locus the allele
-#'          frequencies are given as a matrix with the allele type names as the
-#'          columns and the reference populations as the rows
-#'          e.g. one locus example
+#'      \code{attributes(results)$allele_freqs} -- the posterior estimates of the
+#'          allele frequencies for the populations, as a list, where each element
+#'          of the list corresponds to one locus (and the list elements are named
+#'          with the loci names), and at a single locus the allele frequencies are
+#'          given as a matrix with the allele type names as the columns and the
+#'          reference populations as the rows e.g. one locus example:
 #'
 #'          \code{$TR3G2}
 #'          \tabular{lrrrrrr}{
@@ -223,17 +223,20 @@
 #' @references McMillan, L. and Fewster, R. "Visualizations for genetic assignment
 #'  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
 #'
-#'  Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
-#'  genotypes. \emph{Proceedings of the National Academy of Sciences} \strong{94}, 9197--9201.
-#'  Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+#'  Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using
+#'  multilocus genotypes. \emph{Proceedings of the National Academy of Sciences}
+#'  \strong{94}, 9197--9201.
 #'
+#'  Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
 #'  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
-#'  first-generation migrant detection. \emph{Journal of Heredity} \strong{95}, 536--539.
+#'  first-generation migrant detection. \emph{Journal of Heredity} \strong{95},
+#'  536--539.
 #'
 #' @author Log-Genotype-Probability calculations based on the method of Rannala
-#' and Mountain (1997) as implemented in GeneClass2, updated to allow for individuals
-#' with missing data and to enable accurate calculations of quantiles of the
-#' Log-Genotype-Probability distributions of the reference populations.
+#'   and Mountain (1997) as implemented in GeneClass2, updated to allow for
+#'   individuals with missing data and to enable accurate calculations of
+#'   quantiles of the Log-Genotype-Probability distributions of the reference
+#'   populations.
 #' See McMillan and Fewster (2017) for details.
 #' Coded by Rachel Fewster and Louise McMillan.
 #'
@@ -292,91 +295,99 @@ calc_logprob <- function(dat, refpopnames, locnames,
     ## probabilities for each individual in dat.
     ## Split the data into complete-data individuals, dat_complete, and incomplete-data individuals, dat_missing.
     ## Just check all the locname.a1 columns for 0's, because the locname.a2 column will be the same:
-    any.missing <- apply(dat[paste(locnames, ".a1", sep="")], 1, function(x) any(x==0))
-    dat_complete <- dat[!any.missing,]
-    dat_missing <- dat[any.missing,]
+    any_missing <- apply(dat[paste(locnames, ".a1", sep="")], 1, function(x) any(x==0))
+    dat_complete <- dat[!any_missing,]
+    dat_missing <- dat[any_missing,]
     n_complete <- nrow(dat_complete)
     n_missing <- nrow(dat_missing)
 
     ## Generate LGP distribution -----------------------------------------------
-    ## In three situations, we need to simulate from the distribution of log-posterior genotype probabilities
-    ## for each reference population.  These situations are (a) when there are any missing data, in which case
-    ## the simulations enable us to place the missing-data individuals on the plot so they are represented with the same
-    ## p-values as they would be if only their complete-data loci were shown; and (b) if the vector "quantiles"
-    ## is supplied so that crosslines representing the corresponding quantiles are wanted on the twopop or
-    ## 3spin plot; and (c) if doing leave-one-out, where we need to impute the log-posterior genotype probabilities
-    ## calculated after leaving the individual out on the same scale as the full-population LGPs.
+    ## In three situations, we need to simulate from the distribution of
+    ## log-posterior genotype probabilities for each reference population.
+    ## These situations are (a) when there are any missing data, in which case
+    ## the simulations enable us to place the missing-data individuals on the
+    ## plot so they are represented with the same p-values as they would be if
+    ## only their complete-data loci were shown; and (b) if the vector
+    ## "quantiles" is supplied so that crosslines representing the corresponding
+    ## quantiles are wanted on the twopop or 3spin plot; and (c) if doing
+    ## leave-one-out, where we need to impute the log-posterior genotype
+    ## probabilities calculated after leaving the individual out on the same
+    ## scale as the full-population LGPs.
 
-    ## Initially set up both the all_loci_SCDF_qsearch_params and all_loci_sim_logprob objects
-    ## so that they can be passed in to functions (otherwise we end up with multiple versions of
-    ## function calls, one for each option)
+    ## Initially set up both the all_loci_SCDF_qsearch_params and
+    ## all_loci_sim_logprob objects so that they can be passed in to functions
+    ## (otherwise we end up with multiple versions of function calls, one for
+    ## each option)
     all_loci_SCDF_qsearch_params = NULL
     all_loci_sim_logprob = NULL
 
     if((n_missing > 0 | !is.null(quantiles) | leave_one_out) & saddlepoint){
 
-            # Calculate the SCDF for all loci
-            all_loci_SCDF_qsearch_params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
-                                                                leave_one_out=leave_one_out)
+        # Calculate the SCDF for all loci
+        all_loci_SCDF_qsearch_params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
+                                                            leave_one_out=leave_one_out)
     } else if (!saddlepoint) {
         ## If saddlepoint has not been used, will need to have access to
-        ## all_loci_sim_logprob as an attribute of logprob_results, in order to plot
-        ## the bars in the multi-pop bar plot.
+        ## all_loci_sim_logprob as an attribute of logprob_results, in order to
+        ## plot the bars in the multi-pop bar plot.
         ## So even if is.null(quantiles) and n_missing==0 and leave_one_out=FALSE
         ## we still need to calculate all_loci_sim_logprob when saddlepoint=FALSE.
 
         ## The logs will be base 10 if logten=T, and natural logs otherwise.
-        sim.logprob.bylocus <- lapply(posterior_nu_list, sim_logprob_locus, Nsim=Ndraw, logten=logten)
+        sim_logprob_bylocus <- lapply(posterior_nu_list, sim_logprob_locus, Nsim=Ndraw, logten=logten)
 
         ## For both situations (n_missing>0 or !is.null(quantiles))), we need the all-loci aggregation of these
         ## probabilities: i.e. the distribution of all-locus genotype probabilities under the posterior distributions
         ## for each reference population.
-        all_loci_sim_logprob <- aggregate_logprob(sim.logprob.bylocus, which.loci.names=locnames)
+        all_loci_sim_logprob <- aggregate_logprob(sim_logprob_bylocus, which_loci_names=locnames)
     }
 
     ## Quantiles ---------------------------------------------------------------
-    ## Create the matrix of quantile information if quantiles is non-NULL, for plotting via plot_logprob_twopop or threespin.plot:
-    ## quantile.mat below has the following format:
+    ## Create the matrix of quantile information if quantiles is non-NULL, for
+    ## plotting via plot_logprob_twopop or threespin.plot:
+    ## quantile_mat below has the following format:
     ##              1\%   99\%
     ## Pop1   -37.3 -25.7
     ## Pop2 -29.8 -11.9
-    ## meaning that an individual with a log-genotype probability of less than -37.3 is below the 1% percentile for
-    ## individuals genuinely simulated from the posterior genotype distribution for population Pop1.
+    ## meaning that an individual with a log-genotype probability of less than
+    ## -37.3 is below the 1% percentile for individuals genuinely simulated from
+    ## the posterior genotype distribution for population Pop1.
 
     if(!is.null(quantiles)){
-        ## If only one quantile is required, the quantile matrix loses dimensionality and loses the nice names.
+        ## If only one quantile is required, the quantile matrix loses
+        ## dimensionality and loses the nice names.
         ## Cheap hack to stop this happening is to ask for the same quantile twice:
-        if(length(quantiles)==1) quantiles.vec <- rep(quantiles, 2)
-        else quantiles.vec <- quantiles
+        if(length(quantiles)==1) quantiles_vec <- rep(quantiles, 2)
+        else quantiles_vec <- quantiles
         ## Make sure quantiles are in order:
-        quantiles.vec <- sort(quantiles.vec)
+        quantiles_vec <- sort(quantiles_vec)
 
         ###### Here, change to using quantiles from all-loci SCDF
         if (saddlepoint)
         {
-            if (leave_one_out) qsearch.params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
+            if (leave_one_out) qsearch_params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
                                                                      leave_one_out=leave_one_out)
-            else qsearch.params <- all_loci_SCDF_qsearch_params
+            else qsearch_params <- all_loci_SCDF_qsearch_params
             ## Make sure to use leave-one-out for calc.quantiles.uniroot as well as
             ## for calc.qsearch.params, otherwise the K functions will not work
             ## correctly -- need to be using the twoPops/leave-one-out mode for
             ## all K functions when calculating leave-one-out quantiles
-            quantile.mat = calc.quantiles.uniroot(qsearch.params,
+            quantile_mat = calc.quantiles.uniroot(qsearch_params,
                                                   posterior_nu_list, refpopnames,
-                                                  quantiles.vec, logten=logten,
+                                                  quantiles_vec, logten=logten,
                                                   leave_one_out = leave_one_out)
 
             ## Add column headings to the quantile table
-            colnames(quantile.mat) <- paste0(round(100*quantiles.vec,0),"%")
+            colnames(quantile_mat) <- paste0(round(100*quantiles_vec,0),"%")
         }
         else
         {
-            quantile.mat <- t(apply(all_loci_sim_logprob, 1, quantile, probs=quantiles.vec))
+            quantile_mat <- t(apply(all_loci_sim_logprob, 1, quantile, probs=quantiles_vec))
         }
 
-        if(length(quantiles)==1) quantile.mat <- quantile.mat[,1, drop=F]
+        if(length(quantiles)==1) quantile_mat <- quantile_mat[,1, drop=F]
     }
-    else quantile.mat <- NULL
+    else quantile_mat <- NULL
 
     ## Deal with complete-data individuals --------------------------------------------
 
@@ -384,7 +395,7 @@ calc_logprob <- function(dat, refpopnames, locnames,
         dat_complete$status <- rep("complete", n_complete)
         dat_complete$nloc <- rep(length(locnames), n_complete)
 
-        logprob.complete <- t(sapply(1:n_complete, calc_logprob_complete, dat_complete, refpopnames, locnames,
+        logprob_complete <- t(sapply(1:n_complete, calc_logprob_complete, dat_complete, refpopnames, locnames,
                                      posterior_nu_list, posterior_nusumvec_list,
                                      leave_one_out, saddlepoint, logten, Ndraw,
                                      all_loci_sim_logprob, all_loci_SCDF_qsearch_params))
@@ -392,37 +403,37 @@ calc_logprob <- function(dat, refpopnames, locnames,
         ## Put logprob together with whatever columns out of id, pop, subpop, and nloc are present,
         ## into logprob_results, a data frame:
         logprob_results_complete <- data.frame(dat_complete[,!is.na(match(names(dat_complete),
-                                                                      c("id", "pop", "subpop", "status", "nloc")))],
-                                               logprob.complete)
-        names.complete <- names(logprob_results_complete)
+                                                                          c("id", "pop", "subpop", "status", "nloc")))],
+                                               logprob_complete)
+        names_complete <- names(logprob_results_complete)
     }
     else{
         logprob_results_complete <- NULL
-        if (!is.na(match("subpop",names(dat)))) basicCols <- c("id", "pop", "subpop", "status", "nloc")
-        else basicCols <- c("id", "pop", "status", "nloc")
-        names.complete <- c(basicCols, refpopnames, paste(refpopnames, "raw", sep="."))
+        if (!is.na(match("subpop",names(dat)))) basic_cols <- c("id", "pop", "subpop", "status", "nloc")
+        else basic_cols <- c("id", "pop", "status", "nloc")
+        names_complete <- c(basic_cols, refpopnames, paste(refpopnames, "raw", sep="."))
     }
 
     ## Deal with missing-data individuals ---------------------------------------------
 
     if(n_missing > 0){
         dat_missing$status <- rep("impute", n_missing)
-        logprob.missing <- t(sapply(1:n_missing, calc_logprob_missing, dat_missing, refpopnames, locnames,
+        logprob_missing <- t(sapply(1:n_missing, calc_logprob_missing, dat_missing, refpopnames, locnames,
                                     posterior_nu_list, posterior_nusumvec_list,
-                                    leave_one_out, saddlepoint, logten, Ndraw, sim.logprob.bylocus,
+                                    leave_one_out, saddlepoint, logten, Ndraw, sim_logprob_bylocus,
                                     all_loci_sim_logprob, all_loci_SCDF_qsearch_params))
         logprob_results_missing <- data.frame(dat_missing[,!is.na(match(names(dat_missing),
-                                                                    c("id", "pop", "subpop", "status")))], logprob.missing)
+                                                                        c("id", "pop", "subpop", "status")))], logprob_missing)
         ## Reorder the columns of logprob_results_missing if necessary, in order to match those of logprob_results_complete:
-        logprob_results_missing <- logprob_results_missing[ , match(names.complete, names(logprob_results_missing))]
+        logprob_results_missing <- logprob_results_missing[ , match(names_complete, names(logprob_results_missing))]
         ## If they still don't match, I don't know why: it would need investigating.
         if(any(names(logprob_results_missing)!=names(logprob_results_complete))) stop("Naming of the complete and missing arrays is different. They shouldn't be.")
 
         ## Individuals with too few loci ----------------------------------------------
         ## Remove any individuals from logprob_results_missing that don't meet min_loci
-        n.too.few <- length((1:n_missing)[logprob_results_missing$nloc < min_loci])
-        if(n.too.few > 0){
-            cat("Removing ", n.too.few, "individuals with number of loci < ", min_loci, "\n\n")
+        n_too_few <- length((1:n_missing)[logprob_results_missing$nloc < min_loci])
+        if(n_too_few > 0){
+            cat("Removing ", n_too_few, "individuals with number of loci < ", min_loci, "\n\n")
             logprob_results_missing <- logprob_results_missing[logprob_results_missing$nloc >= min_loci,]
         }
 
@@ -436,12 +447,12 @@ calc_logprob <- function(dat, refpopnames, locnames,
 
     ## Add attributes to the results object ------------------------------------
     attributes(logprob_results)$min_loci <- min_loci
-    if (n_missing > 0) attributes(logprob_results)$n.too.few <- n.too.few
-    else attributes(logprob_results)$n.too.few <- 0
+    if (n_missing > 0) attributes(logprob_results)$n_too_few <- n_too_few
+    else attributes(logprob_results)$n_too_few <- 0
 
     attributes(logprob_results)$percent_missing <- count_missing_loci(logprob_results, dat)
 
-    attributes(logprob_results)$qmat <- quantile.mat
+    attributes(logprob_results)$qmat <- quantile_mat
     attributes(logprob_results)$allele_freqs <- posterior_nu_list
 
     attributes(logprob_results)$refpopnames <- refpopnames
@@ -548,11 +559,11 @@ calc_posterior_locus <- function(loc, dat, popx2, prior, refpopnames){
 
     ## First find all alleles present in dat (where dat includes only the
     ## reference pops specified in the call to calc_logprob) at this locus:
-    a1.name <- paste0(loc, ".a1")
-    a2.name <- paste0(loc, ".a2")
-    dat_alleles <- c(dat[, a1.name], dat[, a2.name])
+    a1_name <- paste0(loc, ".a1")
+    a2_name <- paste0(loc, ".a2")
+    dat_alleles <- c(dat[, a1_name], dat[, a2_name])
 
-    ## allele.tab is a table of all possible alleles in the specified reference
+    ## allele_tab is a table of all possible alleles in the specified reference
     ## populations, and their frequency in those populations, e.g.:
     ##         150  154 156    164  172   178 182    184
     ## Pop1    0    0   18     5    11    0   17     9
@@ -560,15 +571,15 @@ calc_posterior_locus <- function(loc, dat, popx2, prior, refpopnames){
 
     ## Using dnn=NULL below prevents extra names "popx2" and "dat_alleles" being
     ## inherited by other objects later in the coding.
-    allele.tab <- table(popx2, dat_alleles, dnn=NULL)
+    allele_tab <- table(popx2, dat_alleles, dnn=NULL)
     ## Remove missing data (code = 0):
-    allele.tab <- allele.tab[ , colnames(allele.tab)!="0", drop=F]
+    allele_tab <- allele_tab[ , colnames(allele_tab)!="0", drop=F]
 
     ## Determine choice for prior: the prior distribution of allele frequencies
     ## at each locus will be
     ## prior(p1, ..., pk) ~ Dirichlet(alpha/k, ..., alpha/k)
     ## for a locus with k possible alleles, and user chooses the value of alpha.
-    k <- ncol(allele.tab)
+    k <- ncol(allele_tab)
     if(prior=="Rannala") alpha <- 1
     else if(prior=="Baudouin") alpha <- k
 
@@ -576,11 +587,11 @@ calc_posterior_locus <- function(loc, dat, popx2, prior, refpopnames){
     else if(prior=="Quarter") alpha <- k/4
 
     ## Find the posterior nuvec for each population in refpopnames.
-    ## It's as simple as adding alpha/k to the existing allele.tab, because the
+    ## It's as simple as adding alpha/k to the existing allele_tab, because the
     ## posterior is
     ## (p1, ..., pk) ~ Dirichlet ( alpha/k + n_1, ...., alpha/k + n_k ),
-    ## and the values n_1, ..., n_k are exactly what are found in allele.tab.
-    posterior_nu_tab <- alpha/k + allele.tab[refpopnames, , drop=F]
+    ## and the values n_1, ..., n_k are exactly what are found in allele_tab.
+    posterior_nu_tab <- alpha/k + allele_tab[refpopnames, , drop=F]
 
     ## Using the example above, if prior="Baudouin"
     ## (so prior ~ Dirichlet(1, 1, ..., 1))
@@ -627,61 +638,63 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
 
     ## For leave-one-out, create a separate copy of posterior_nu_list to store the left-one-out
     ## allele frequencies for this individual
-    if (leave_one_out && indiv_dat$pop %in% refpopnames) LOO.posterior_nu_list <- posterior_nu_list
+    if (leave_one_out && indiv_dat$pop %in% refpopnames) LOO_posterior_nu_list <- posterior_nu_list
 
     indiv_allele_freqs <- vector()
-    indiv_allele_freqs.LOO <- vector()
+    indiv_allele_freqs_LOO <- vector()
 
     log_indiv_probvec <- 0
     for(loc in locnames){
 
-        loc.table <- posterior_nu_list[[loc]]
+        loc_table <- posterior_nu_list[[loc]]
         nusumvec <- posterior_nusumvec_list[[loc]]
-        a1.name <- paste0(loc, ".a1")
-        a2.name <- paste0(loc, ".a2")
-        indiv_a1 <- as.character(indiv_dat[a1.name])
-        indiv_a2 <- as.character(indiv_dat[a2.name])
+        a1_name <- paste0(loc, ".a1")
+        a2_name <- paste0(loc, ".a2")
+        indiv_a1 <- as.character(indiv_dat[a1_name])
+        indiv_a2 <- as.character(indiv_dat[a2_name])
 
-        col.a1 <- which(colnames(loc.table)==indiv_a1)
-        col.a2 <- which(colnames(loc.table)==indiv_a2)
+        col_a1 <- which(colnames(loc_table)==indiv_a1)
+        col_a2 <- which(colnames(loc_table)==indiv_a2)
 
-        if (length(col.a1) == 0 || length(col.a2) == 0) browser()
+        if (length(col_a1) == 0 || length(col_a2) == 0) browser()
 
-        ## For leave-one-out, correct the posterior allele frequencies by subtracting 1
-        ## for each of the individual's alleles -- but only for the individual's own labelled population
+        ## For leave-one-out, correct the posterior allele frequencies by
+        ## subtracting 1 for each of the individual's alleles -- but only for
+        ## the individual's own labelled population
         ## Do not do this for individuals in includepopnames
         if (leave_one_out && indiv_dat$pop %in% refpopnames)
         {
-            loc.table[indiv_dat$pop, indiv_a1] = loc.table[indiv_dat$pop, indiv_a1] - 1
-            loc.table[indiv_dat$pop, indiv_a2] = loc.table[indiv_dat$pop, indiv_a2] - 1
+            loc_table[indiv_dat$pop, indiv_a1] = loc_table[indiv_dat$pop, indiv_a1] - 1
+            loc_table[indiv_dat$pop, indiv_a2] = loc_table[indiv_dat$pop, indiv_a2] - 1
             nusumvec[indiv_dat$pop] = nusumvec[indiv_dat$pop] - 2
 
-            ## Also change the estimated allele frequencies at this locus by removing
-            ## the rat's own alleles
-            ## Must subtract 1 from LOO.posterior_nu_list so that for homozygotes,
+            ## Also change the estimated allele frequencies at this locus by
+            ## removing the individual's own alleles
+            ## Must subtract 1 from LOO_posterior_nu_list so that for homozygotes,
             ## take same allele away twice (if subtracting each time directly from
             ## from posterior_nu_list, end up only taking allele away once)
-            LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] = LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] - 1
-            LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] = LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] - 1
+            LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] = LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] - 1
+            LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] = LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] - 1
 
-            indiv_allele_freqs.LOO <- c(indiv_allele_freqs.LOO,loc.table[,col.a1],loc.table[,col.a2])
+            indiv_allele_freqs_LOO <- c(indiv_allele_freqs_LOO,loc_table[,col_a1],loc_table[,col_a2])
         }
 
-        indiv_allele_freqs <- c(indiv_allele_freqs,loc.table[,col.a1]+1,loc.table[,col.a2]+1)
+        indiv_allele_freqs <- c(indiv_allele_freqs,loc_table[,col_a1]+1,loc_table[,col_a2]+1)
 
-        if(col.a1==col.a2)
-            prob.loc <- loc.table[,col.a1] * (loc.table[,col.a1] + 1) / ( nusumvec * (nusumvec+1) ) # Homozygote
+        if(col_a1==col_a2)
+            prob_loc <- loc_table[,col_a1] * (loc_table[,col_a1] + 1) / ( nusumvec * (nusumvec+1) ) # Homozygote
         else
-            prob.loc <- 2 * loc.table[,col.a1] * loc.table[,col.a2]  / ( nusumvec * (nusumvec+1) ) # Heterozygote
+            prob_loc <- 2 * loc_table[,col_a1] * loc_table[,col_a2]  / ( nusumvec * (nusumvec+1) ) # Heterozygote
 
-        if(logten) log_indiv_probvec <- log_indiv_probvec + log10(prob.loc)
-        else log_indiv_probvec <- log_indiv_probvec + log(prob.loc)
+        if(logten) log_indiv_probvec <- log_indiv_probvec + log10(prob_loc)
+        else log_indiv_probvec <- log_indiv_probvec + log(prob_loc)
     } # end for-locus loop
 
     ## The log_indiv_probvec returned is of the following form:
     ##       Pop1       Pop2       DBM
     ##      -13.9      -22.3        -17.4
 
+    ## NOTE: since 2018-09, no longer converting LOO logprobs back into non-LOO LGP space
     if (leave_one_out && indiv_dat$pop %in% refpopnames) ## If doing leave-one-out, impute individual LGP for its own population
     {
         if (!saddlepoint)
@@ -692,10 +705,7 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
             ## log_indiv_present,
             ## e.g. length((1:Ndraw)[indiv_agg["Pop1",] <= log_indiv_present["Pop1"]])/Ndraw
             indiv_p <- length((1:Ndraw)[all_loci_sim_logprob[indiv_dat$pop,] <= log_indiv_probvec[indiv_dat$pop]])/Ndraw
-        }
 
-        if (!saddlepoint)
-        {
             ## The result is the p-value for each reference pop:
             ## e.g. indiv_p = 0.501 for rpop = Pop1 means that 50.1% of individuals from the genuine Pop1 posterior
             ## have a log-genotype probability less than or equal to the one that this individual has.
@@ -704,20 +714,20 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
             q <- quantile(all_loci_sim_logprob[indiv_dat$pop,], probs=indiv_p)
         }
 
-        leave_one_out.probvec <- log_indiv_probvec
-        # leave_one_out.probvec[indiv_dat$pop] <- q
-        if (!saddlepoint) leave_one_out.probvec[indiv_dat$pop] <- q
+        leave_one_out_probvec <- log_indiv_probvec
+        # leave_one_out_probvec[indiv_dat$pop] <- q
+        if (!saddlepoint) leave_one_out_probvec[indiv_dat$pop] <- q
 
         ## Add the raw (non-imputed) columns to the imputed columns to return both:
         names(log_indiv_probvec) <- paste(names(log_indiv_probvec), "raw", sep=".")
-        log_indiv_complete <- c(leave_one_out.probvec, log_indiv_probvec)
+        log_indiv_complete <- c(leave_one_out_probvec, log_indiv_probvec)
     }
     else
     {
-        ## For complete-data individuals when not using leave-one-out, the "raw" results are the same as the logprob.complete results:
-        logprob.raw <- log_indiv_probvec
-        names(logprob.raw) <- paste(names(log_indiv_probvec), "raw", sep=".")
-        log_indiv_complete <- c(log_indiv_probvec, logprob.raw)
+        ## For complete-data individuals when not using leave-one-out, the "raw" results are the same as the logprob_complete results:
+        logprob_raw <- log_indiv_probvec
+        names(logprob_raw) <- paste(names(log_indiv_probvec), "raw", sep=".")
+        log_indiv_complete <- c(log_indiv_probvec, logprob_raw)
     }
     log_indiv_complete
 } # end calc_logprob_complete
@@ -725,7 +735,7 @@ calc_logprob_complete <- function(row, dat_complete, refpopnames, locnames,
 calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
                                  posterior_nu_list, posterior_nusumvec_list,
                                  leave_one_out, saddlepoint, logten, Ndraw,
-                                 sim.logprob.bylocus=NULL,
+                                 sim_logprob_bylocus=NULL,
                                  all_loci_sim_logprob = NULL,
                                  all_loci_SCDF_qsearch_params = NULL){
     ## calc_logprob_missing takes a row of the data frame "dat_missing".
@@ -747,61 +757,61 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
 
     ## For leave-one-out, create a separate copy of posterior_nu_list to store
     ## the left-one-out allele frequencies for this individual
-    if (leave_one_out && indiv_dat$pop %in% refpopnames) LOO.posterior_nu_list <- posterior_nu_list
+    if (leave_one_out && indiv_dat$pop %in% refpopnames) LOO_posterior_nu_list <- posterior_nu_list
 
     ## Find which loci are present for this individual:
-    indiv_loc.a1 <- indiv_dat[paste(locnames, ".a1", sep="")]
-    locnames.missing <- locnames [which( indiv_loc.a1 ==0)]
-    locnames.present <- locnames [which( indiv_loc.a1 !=0)]
+    indiv_loc_a1 <- indiv_dat[paste(locnames, ".a1", sep="")]
+    locnames_missing <- locnames [which( indiv_loc_a1 ==0)]
+    locnames_present <- locnames [which( indiv_loc_a1 !=0)]
 
-    if (length(locnames.present) == 0) browser()
+    if (length(locnames_present) == 0) browser()
 
     ## Find the aggregate log genotype probabilities for the loci present, so we
     ## can look up this individual's values:
     if (!saddlepoint)
     {
-        if (is.null(sim.logprob.bylocus)) stop("sim.logprob.bylocus cannot be null when using non-saddlepoint Ndraw method.")
-        indiv_agg <- aggregate_logprob(sim.logprob.bylocus, which.loci.names=locnames.present)
+        if (is.null(sim_logprob_bylocus)) stop("sim_logprob_bylocus cannot be null when using non-saddlepoint Ndraw method.")
+        indiv_agg <- aggregate_logprob(sim_logprob_bylocus, which_loci_names=locnames_present)
     }
 
     log_indiv_present <- 0
-    for(loc in locnames.present){
-        loc.table <- posterior_nu_list[[loc]]
+    for(loc in locnames_present){
+        loc_table <- posterior_nu_list[[loc]]
         nusumvec <- posterior_nusumvec_list[[loc]]
-        a1.name <- paste0(loc, ".a1")
-        a2.name <- paste0(loc, ".a2")
+        a1_name <- paste0(loc, ".a1")
+        a2_name <- paste0(loc, ".a2")
 
-        indiv_a1 <- as.character(indiv_dat[a1.name])
-        indiv_a2 <- as.character(indiv_dat[a2.name])
+        indiv_a1 <- as.character(indiv_dat[a1_name])
+        indiv_a2 <- as.character(indiv_dat[a2_name])
 
-        col.a1 <- which(colnames(loc.table)==indiv_a1)
-        col.a2 <- which(colnames(loc.table)==indiv_a2)
+        col_a1 <- which(colnames(loc_table)==indiv_a1)
+        col_a2 <- which(colnames(loc_table)==indiv_a2)
 
         ## For leave-one-out, correct the posterior allele frequencies by
         ## subtracting 1 for each of the individual's alleles -- but only for
         ## the individual's own labelled population
         if (leave_one_out && indiv_dat$pop %in% refpopnames)
         {
-            loc.table[indiv_dat$pop, indiv_a1] = loc.table[indiv_dat$pop, indiv_a1] - 1
-            loc.table[indiv_dat$pop, indiv_a2] = loc.table[indiv_dat$pop, indiv_a2] - 1
+            loc_table[indiv_dat$pop, indiv_a1] = loc_table[indiv_dat$pop, indiv_a1] - 1
+            loc_table[indiv_dat$pop, indiv_a2] = loc_table[indiv_dat$pop, indiv_a2] - 1
             nusumvec[indiv_dat$pop] = nusumvec[indiv_dat$pop] - 2
 
-            ## Also change the estimated allele frequencies at this locus by removing
-            ## the rat's own alleles
-            ## Must subtract 1 from LOO.posterior_nu_list so that for homozygotes,
+            ## Also change the estimated allele frequencies at this locus by
+            ## removing the individual's own alleles
+            ## Must subtract 1 from LOO_posterior_nu_list so that for homozygotes,
             ## take same allele away twice (if subtracting each time directly from
             ## from posterior_nu_list, end up only taking allele away once)
-            LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] = LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] - 1
-            LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] = LOO.posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] - 1
+            LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] = LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a1] - 1
+            LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] = LOO_posterior_nu_list[[loc]][indiv_dat$pop, indiv_a2] - 1
         }
 
-        if(col.a1==col.a2)
-            prob.loc <- loc.table[,col.a1] * (loc.table[,col.a1] + 1) / ( nusumvec * (nusumvec+1) ) # Homozygote
+        if(col_a1==col_a2)
+            prob_loc <- loc_table[,col_a1] * (loc_table[,col_a1] + 1) / ( nusumvec * (nusumvec+1) ) # Homozygote
         else
-            prob.loc <- 2 * loc.table[,col.a1] * loc.table[,col.a2]  / ( nusumvec * (nusumvec+1) ) # Heterozygote
+            prob_loc <- 2 * loc_table[,col_a1] * loc_table[,col_a2]  / ( nusumvec * (nusumvec+1) ) # Heterozygote
 
-        if(logten) log_indiv_present <- log_indiv_present + log10(prob.loc)
-        else log_indiv_present <- log_indiv_present + log(prob.loc)
+        if(logten) log_indiv_present <- log_indiv_present + log10(prob_loc)
+        else log_indiv_present <- log_indiv_present + log(prob_loc)
     } # end for-locus loop for loci with data intact
 
     ## We now have something like this for log_indiv_present (in the case of three
@@ -815,7 +825,7 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
     ## Pop2 -4.97 -3.71 -4.81 -7.47
     ## Pop3 -6.36 -9.25 -8.45 -7.48
     ##
-    ## Or for saddlepoint=TRUE we have post.info, which defines the distributions
+    ## Or for saddlepoint=TRUE we have post_info, which defines the distributions
     ## of log-genotype-probabilities for the complete set of all loci, and for
     ## the reduced set of loci present in this individual.
 
@@ -828,27 +838,27 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
             ###### For leave-one-out, if this individual is from this refpop,
             ###### use the Leave-One-Out allele frequencies for the
             ###### reduced set of loci
-            if (leave_one_out & indiv_dat$pop==rpop) post.nu.pop <- lapply(LOO.posterior_nu_list[locnames.present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
-            else post.nu.pop <- lapply(posterior_nu_list[locnames.present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
-            if (length(post.nu.pop) == 0) browser()
-            # post.info <- calc.multi.locus.probs.func(post.nu.pop)
-            post.info <- calc.multi.locus.probs.func(post.nu.pop, leave_one_out=leave_one_out)
-            multi.K.params <- make.K.params(post.info$dist)
-            # mean.pop <- mu(multi.K.params)
-            # indiv_p <- Fhat(log_indiv_present[rpop], post.info, mean.pop=mean.pop, logten=logten)
-            mean.pop <- mu(multi.K.params, twoPops=leave_one_out)
-            indiv_p <- Fhat(log_indiv_present[rpop], post.info, mean.pop=mean.pop, logten=logten, twoPops=leave_one_out)
+            if (leave_one_out & indiv_dat$pop==rpop) post_nu_pop <- lapply(LOO_posterior_nu_list[locnames_present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
+            else post_nu_pop <- lapply(posterior_nu_list[locnames_present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
+            if (length(post_nu_pop) == 0) browser()
+            # post_info <- calc.multi.locus.probs.func(post_nu_pop)
+            post_info <- calc.multi.locus.probs.func(post_nu_pop, leave_one_out=leave_one_out)
+            multi_K_params <- make.K.params(post_info$dist)
+            # mean_pop <- mu(multi_K_params)
+            # indiv_p <- Fhat(log_indiv_present[rpop], post_info, mean_pop=mean_pop, logten=logten)
+            mean_pop <- mu(multi_K_params, twoPops=leave_one_out)
+            indiv_p <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
 
             if (is.na(indiv_p))
             {
                 print("indiv_p is NA")
-                test <- Fhat(log_indiv_present[rpop], post.info, mean.pop=mean.pop, logten=logten, twoPops=leave_one_out)
+                test <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
             }
 
             if (is.infinite(indiv_p))
             {
                 print("indiv_p is infinite")
-                test <- Fhat(log_indiv_present[rpop], post.info, mean.pop=mean.pop, logten=logten, twoPops=leave_one_out)
+                test <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
             }
         }
         else
@@ -888,7 +898,7 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
 
     ## For missing-data individuals, tack the number of complete loci on to the beginning so it
     ## gels with the equivalent for the complete-data individuals data frame:
-    log_indiv_probvec <- c(length(locnames.present), log_indiv_probvec)
+    log_indiv_probvec <- c(length(locnames_present), log_indiv_probvec)
     names(log_indiv_probvec) <- c("nloc", refpopnames)
 
     ## The log_indiv_probvec returned is of the following form:
@@ -903,7 +913,8 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
 
 find_nloc <- function(dat, locnames){
     ## find_nloc 10/6/10
-    ## Takes input data frame and adds a column nloc specifying how many loci are successful for each individual.
+    ## Takes input data frame and adds a column nloc specifying how many loci
+    ## are successful for each individual.
     ## It also ensures that dat$pop is a character vector.
     ## EXAMPLE:
     ## gbi.dat <- find_nloc(gbi.dat)
@@ -912,15 +923,15 @@ find_nloc <- function(dat, locnames){
     ## OR:
     ## find_nloc(gbi.dat, locnames=loc.names.fixed[-c(1, 3, 8)])$nloc
     dat$pop <- as.character(dat$pop)
-    nrats <- nrow(dat)
+    ninds <- nrow(dat)
     ## nloc is a record for each individual giving the number of successful loci:
-    nloc <- rep(0, nrats)
-    loc.col.names <- paste(rep(locnames, each=2), c("a1", "a2"), sep=".")
-    for(loc.col in loc.col.names){
-        dat[,loc.col][is.na(dat[,loc.col])] <- 0
+    nloc <- rep(0, ninds)
+    loc_col_names <- paste(rep(locnames, each=2), c("a1", "a2"), sep=".")
+    for(loc_col in loc_col_names){
+        dat[,loc_col][is.na(dat[,loc_col])] <- 0
         ## Add 0.5 to the number of present loci for each individual which DOESN'T have missing
         ## record at this loc.allele.  The 0.5 should be replicated by the other allele for the same locus.
-        nloc[dat[,loc.col]!=0] <- nloc[dat[,loc.col]!=0] + 0.5
+        nloc[dat[,loc_col]!=0] <- nloc[dat[,loc_col]!=0] + 0.5
     }
     dat$nloc <- nloc
     dat
@@ -993,31 +1004,31 @@ sim_logprob_locus <- function(nutab, Nsim, logten){
         ## Because all probabilities have the same denominator (nusum * (nusum+1)),
         ## calculate the common denominator to divide by at the end:
         nusum <- sum(nupop)
-        common.denom <- nusum* (nusum + 1)
+        common_denom <- nusum* (nusum + 1)
 
         ## To find all homozygotes, the probabilities are
         ## nupop * (nupop+1) / (nusum * (nusum+1)).
         ## Create the vector of numerators of these probabilities:
-        homozyg.top <- nupop * (nupop + 1)
+        homozyg_top <- nupop * (nupop + 1)
 
         ## For heterozygotes, we need all pairs of alleles (call them s and t),
-        ## then the probabilities are 2 nu[s] nu[t] / common.denom.
+        ## then the probabilities are 2 nu[s] nu[t] / common_denom.
         ## Using outer() gives the values nu[s] * nu[t] for all possible pairings
         ## of s and t.  Use the lower triangle of these only, i.e. the pairs where
         ## s is not equal to t, and multiply by 2. Dscard the diagonal homozygotes.
-        ## The result in heterozyg.top is a vector.
-        outer.nu <- outer(nupop, nupop)
-        heterozyg.top <- 2 * outer.nu[lower.tri(outer.nu, diag=F)]
+        ## The result in heterozyg_top is a vector.
+        outer_nu <- outer(nupop, nupop)
+        heterozyg_top <- 2 * outer_nu[lower.tri(outer_nu, diag=F)]
 
-        ## The vector of all genotype probabilities is geno.probvec:
-        geno.probvec <- c(homozyg.top, heterozyg.top) / common.denom
+        ## The vector of all genotype probabilities is geno_probvec:
+        geno_probvec <- c(homozyg_top, heterozyg_top) / common_denom
 
         ## Now simulate Nsim log-genotype probabilities with the probabilities
-        ## given in geno.probvec:
+        ## given in geno_probvec:
         if(logten)
-            log_geno_prob_sim <- sample(log10(geno.probvec), size=Nsim, replace=T, prob=geno.probvec)
+            log_geno_prob_sim <- sample(log10(geno_probvec), size=Nsim, replace=T, prob=geno_probvec)
         else
-            log_geno_prob_sim <- sample(log(geno.probvec), size=Nsim, replace=T, prob=geno.probvec)
+            log_geno_prob_sim <- sample(log(geno_probvec), size=Nsim, replace=T, prob=geno_probvec)
         return(log_geno_prob_sim)
     }
 
@@ -1025,19 +1036,19 @@ sim_logprob_locus <- function(nutab, Nsim, logten){
     t(apply(nutab, 1, sim_logprob_onepop))
 }
 
-aggregate_logprob <- function(sim.logprob, which.loci.names){
+aggregate_logprob <- function(sim_logprob, which_loci_names){
     ## aggregate_logprob
-    ## Given a sim.logprob object corresponding to the output from
+    ## Given a sim_logprob object corresponding to the output from
     ## lapply(posterior_nu_list, sim_logprob_locus, Nsim),
-    ## this function aggregates across the loci specified by which.loci.names,
+    ## this function aggregates across the loci specified by which_loci_names,
     ## and returns a matrix with rows corresponding to populations, and Nsim
     ## columns such that the Nsim columns are the SUMMED results across the
     ## specified loci of the log-genotype probabilities.
-    ## It doesn't matter whether the sim.logprob is in log_10 or log_e, because
+    ## It doesn't matter whether the sim_logprob is in log_10 or log_e, because
     ## it will all be in the same base.
     ##
-    ## EXAMPLE: suppose which.loci.names=c("D10Rat20", "D11Mgh5"),
-    ## and the input sim.logprob has Nsim=5 and looks like this:
+    ## EXAMPLE: suppose which_loci_names=c("D10Rat20", "D11Mgh5"),
+    ## and the input sim_logprob has Nsim=5 and looks like this:
     ##   $D10Rat20
     ##   Pop1 -0.62 -0.62 -2.39 -0.62 -0.62
     ##   Pop2 -3.49 -2.95 -3.55 -2.90 -4.80
@@ -1059,15 +1070,15 @@ aggregate_logprob <- function(sim.logprob, which.loci.names){
     ## and likewise for Pop2:
     ## e.g. -0.62 - 1.06 = -1.680 for the first element; etc.
 
-    subset.list <- sim.logprob[which.loci.names]
-    subset.sum <- subset.list[[1]]
-    n.in.list <- length(which.loci.names)
+    subset_list <- sim_logprob[which_loci_names]
+    subset_sum <- subset_list[[1]]
+    n_in_list <- length(which_loci_names)
 
     ## If there is more than one locus, add the others to the first one:
-    if(n.in.list > 1)
-        for(locn in 2:n.in.list) subset.sum <- subset.sum + subset.list[[locn]]
+    if(n_in_list > 1)
+        for(locn in 2:n_in_list) subset_sum <- subset_sum + subset_list[[locn]]
 
-    subset.sum
+    subset_sum
 }
 
 rDirichlet <- function(ndraw, alphvec){

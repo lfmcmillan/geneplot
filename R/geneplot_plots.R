@@ -1,7 +1,8 @@
 #' Produce GenePlots of the results from \code{\link{calc_logprob}}.
 #'
-#' Produce GenePlots of the results obtained from running \code{\link{calc_logprob}}, or replot
-#' the results obtained from running \code{\link{geneplot}}.
+#' Produce GenePlots of the results obtained from running
+#' \code{\link{calc_logprob}}, or replot the results obtained from running
+#' \code{\link{geneplot}}.
 #'
 #' @param logprob_results A data frame containing the results of the GenePlot
 #'     calculations, as obtained by running \code{\link{geneplot}} or
@@ -9,8 +10,8 @@
 #'
 #' @param plot_type (default NULL) Can be used to specify "twopop" or "manypop"
 #'     plots. Defaults to "twopop" for 2 reference pops (i.e. 2 pops listed in
-#'     \code{refpopnames} in the call to \code{\link{geneplot}} or \code{\link{calc_logprob}})
-#'     and "manypop" for >2 reference pops.
+#'     \code{refpopnames} in the call to \code{\link{geneplot}} or
+#'     \code{\link{calc_logprob}}) and "manypop" for >2 reference pops.
 #'
 #' @param plot_bars (default FALSE) Specify what type of plot to use for >2
 #'     reference populations.
@@ -24,12 +25,12 @@
 #'     ordering is then used to display them in all the other bar plots as well,
 #'     so that all the bar plots show the individuals in the same order.
 #'
-#' @param colvec (default=grDevices::rainbow(npop, s=0.5, start=0.625, end=0.42)) Vector
-#'     of colours for plotting. The colours correspond to populations
-#'     specified in the order of \code{c(refpopnames, includepopnames)}. Thus the
-#'     first element of colvec corresponds to the first element of \code{refpopnames};
-#'     the last element of colvec corresponds to the last element of
-#'     \code{includepopnames}.
+#' @param colvec (default=rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop])
+#'     Vector of colours for plotting. The colours correspond to populations
+#'     specified in the order of \code{c(refpopnames, includepopnames)}. Thus
+#'     the first element of colvec corresponds to the first element of
+#'     \code{refpopnames}; the last element of colvec corresponds to the last
+#'     element of \code{includepopnames}.
 #'     Colours can be specified using rgb objects, hexadecimal codes, or any of
 #'     the R colour names (see \url{http://www.stat.columbia.edu/~tzheng/files/Rcolor.pdf}
 #'     for a PDF of R colours).
@@ -44,21 +45,22 @@
 #'     Do not use the numbers, use the words, which will be automatically
 #'     converted within plot_logprob into the appropriate codes.
 #'     The elements of shapevec correspond to the populations specified in the
-#'     order of \code{c(refpopnames, includepopnames)}. Thus the first element of
-#'     shapevec corresponds to the first element of \code{refpopnames}; the last
-#'     element of shapevec corresponds to the last element of \code{includepopnames}.
+#'     order of \code{c(refpopnames, includepopnames)}. Thus the first element
+#'     of shapevec corresponds to the first element of \code{refpopnames}; the
+#'     last element of shapevec corresponds to the last element of
+#'     \code{includepopnames}.
 #'     Defaults to the list above, looping through as many times as required for
 #'     all the populations.
 #'
 #' @param mark_impute (default FALSE) Boolean, indicates whether to mark
 #'     individuals with missing data using asterisks.
 #'
-#' @param txt (default "points") Defines whether to plot individuals as points on
-#'     the GenePlot (\code{"points"}), or whether to display the name of their
-#'     population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID (\code{"id"})
-#'     as text. For \code{"subpop"}, must have 'subpop' as one of the columns in
-#'     the \code{dat} input to calc_logprob. Then 'subpop' will automatically be
-#'     included in the \code{logprob_results} object.
+#' @param txt (default "points") Defines whether to plot individuals as points
+#'     on the GenePlot (\code{"points"}), or whether to display the name of
+#'     their population (\code{"pop"}), subpopulation (\code{"subpop"}), or ID
+#'     (\code{"id"}) as text. For \code{"subpop"}, must have 'subpop' as one of
+#'     the columns in the \code{dat} input to calc_logprob. Then 'subpop' will
+#'     automatically be included in the \code{logprob_results} object.
 #'
 #' @param use_legend (default TRUE) Plot the legend (or FALSE for don't plot the legend).
 #'
@@ -119,13 +121,18 @@
 #'
 #' @return Displays the plot.
 #'
-#' @references McMillan, L. and Fewster, R. "Visualizations for genetic assignment
-#'  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
-#'  Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
-#'  genotypes. \emph{Proceedings of the National Academy of Sciences} \strong{94}, 9197--9201.
-#'  Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
-#'  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
-#'  first-generation migrant detection. \emph{Journal of Heredity} \strong{95}, 536--539.
+#' @references McMillan, L. and Fewster, R. "Visualizations for genetic
+#'   assignment analyses using the saddlepoint approximation method" (2017)
+#'   \emph{Biometrics}.
+#'
+#'   Rannala, B., and Mountain, J. L. (1997). Detecting
+#'   immigration by using multilocus genotypes. \emph{Proceedings of the
+#'   National Academy of Sciences} \strong{94}, 9197--9201.
+#'
+#'   Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+#'   Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
+#'   first-generation migrant detection. \emph{Journal of Heredity} \strong{95},
+#'   536--539.
 #'
 #' @author Log-Genotype-Probability calculations based on the method of Rannala
 #' and Mountain (1997) as implemented in GeneClass2, updated to allow for individuals
@@ -175,30 +182,34 @@ plot_logprob <- function(logprob_results,
     ## Error checking
     if (plot_type=="twopop")
     {
-        if(!is.null(axispop) && (!is.character(axispop) || !is.vector(axispop) || names(axispop) != c("x","y"))) stop("axispop must be specified in the form c(x='Pop1',y='Pop2')")
+        if(!is.null(axispop) &&
+           (!is.character(axispop) || !is.vector(axispop) ||
+            names(axispop) != c("x","y"))) stop("axispop must be specified in the form c(x='Pop1',y='Pop2')")
     }
 
     ## Shapes and colours ------------------------------------------------------
-    shapevec.default <- rep(21:25, npop)[1:npop]
+    shapevec_default <- rep(21:25, npop)[1:npop]
     if(length(shapevec)>1){
         ## If some shapes are supplied then shapevec has length npop, otherwise shapevec=NA (length 1)
-        shapes.ref <- c("Circle", "Square", "Diamond", "TriangleUp", "TriangleDown", "OpenSquare", "OpenCircle",
-                        "OpenTriangleUp", "Plus", "Cross", "OpenDiamond", "OpenTriangleDown", "Asterisk")
-        numbers.ref <- c(21, 22, 23, 24, 25, 0, 1, 2, 3, 4, 5, 6, 8)
-        shapes.inds <- match(shapevec, shapes.ref)
-        shapevec <- numbers.ref[shapes.inds]
-        shapevec[is.na(shapevec)] <- shapevec.default[is.na(shapevec)]
+        shapes_ref <- c("Circle", "Square", "Diamond", "TriangleUp",
+                        "TriangleDown", "OpenSquare", "OpenCircle",
+                        "OpenTriangleUp", "Plus", "Cross", "OpenDiamond",
+                        "OpenTriangleDown", "Asterisk")
+        numbers_ref <- c(21, 22, 23, 24, 25, 0, 1, 2, 3, 4, 5, 6, 8)
+        shapes_inds <- match(shapevec, shapes_ref)
+        shapevec <- numbers_ref[shapes_inds]
+        shapevec[is.na(shapevec)] <- shapevec_default[is.na(shapevec)]
     }
-    else shapevec <- shapevec.default
+    else shapevec <- shapevec_default
 
     ## Note: using the RColorBrewer brewer.pal() function NOT the grDevices
     ## palette() function because the latter only has 10 colours in the "Paired"
     ## palette so loops in sync with the 5 default shapes, whereas the original
     ## RColorBrewer "Paired" palette has 12 colours
-    colvec.default <- rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop]
+    colvec_default <- rep(RColorBrewer::brewer.pal(12,"Paired")[c(1:10,12)], npop)[1:npop]
     ## If some colours are supplied then colvec has length npop, otherwise colvec=NA (length 1)
-    if(length(colvec)>1) colvec[is.na(colvec)] <- colvec.default[is.na(colvec)]
-    else colvec <- colvec.default
+    if(length(colvec)>1) colvec[is.na(colvec)] <- colvec_default[is.na(colvec)]
+    else colvec <- colvec_default
 
     ## In case xyrange is entered the wrong way round by the user:
     if(!is.null(xyrange)) xyrange <- sort(xyrange)
@@ -209,18 +220,18 @@ plot_logprob <- function(logprob_results,
     if(is.null(orderpop)){
         ## If no plotting order is specified (orderpop not supplied), arrange allpopnames to be
         ## in decreasing order of sample size:
-        allpopsizes <- numeric(length(npop))
-        for(pp in 1:npop) allpopsizes[pp] <- length(logprob_results$pop[logprob_results$pop==allpopnames[pp]])
-        order.inds <- order(allpopsizes, decreasing=T)
+        allpop_sizes <- numeric(length(npop))
+        for(pp in 1:npop) allpop_sizes[pp] <- length(logprob_results$pop[logprob_results$pop==allpopnames[pp]])
+        order_inds <- order(allpop_sizes, decreasing=T)
     }
-    ## If orderpop is supplied, order.inds is gained from matching orderpop straight to allpopnames:
-    else order.inds <- match(orderpop, allpopnames)
-    allpopnames <- allpopnames[order.inds]
+    ## If orderpop is supplied, order_inds is gained from matching orderpop straight to allpopnames:
+    else order_inds <- match(orderpop, allpopnames)
+    allpopnames <- allpopnames[order_inds]
 
     ## Reorder shapevec and colvec by the same ordering to keep the correct assignment of
     ## colours and shapes to populations:
-    shapevec <- shapevec[order.inds]
-    colvec <- colvec[order.inds]
+    shapevec <- shapevec[order_inds]
+    colvec <- colvec[order_inds]
 
     ## If axispop is not specified, and there are two reference populations, make axispop the same as refpopnames:
     if(is.null(axispop) & length(refpopnames)==2){
@@ -233,8 +244,8 @@ plot_logprob <- function(logprob_results,
     {
         if (saddlepoint)
         {
-            plot_logprob_barplot(logprob=logprob_results, refpopnames=refpopnames, allpopnames=allpopnames,
-                                 colvec=colvec, logten=logten,
+            plot_logprob_barplot(logprob=logprob_results, refpopnames=refpopnames,
+                                 allpopnames=allpopnames, colvec=colvec, logten=logten,
                                  quantile_mat=quantile_mat, all_loci_sim_logprob=NULL,
                                  posterior_nu_list=posterior_nu_list,
                                  axis_labels=axis_labels, use_legend=use_legend,
@@ -244,9 +255,9 @@ plot_logprob <- function(logprob_results,
         {
             all_loci_sim_logprob <- attributes(logprob_results)$all_loci_sim_logprob
 
-            plot_logprob_barplot(logprob=logprob_results, refpopnames=refpopnames, allpopnames=allpopnames,
-                                 colvec=colvec, logten=logten,
-                                 quantile_mat=quantile_mat,
+            plot_logprob_barplot(logprob=logprob_results, refpopnames=refpopnames,
+                                 allpopnames=allpopnames, colvec=colvec,
+                                 logten=logten, quantile_mat=quantile_mat,
                                  all_loci_sim_logprob=all_loci_sim_logprob,
                                  posterior_nu_list=NULL, axis_labels=axis_labels,
                                  use_legend=use_legend, layout_already_set=layout_already_set)
@@ -254,22 +265,32 @@ plot_logprob <- function(logprob_results,
     }
     else
     {
-        if(plot_type=="twopop") plot_logprob_twopop(logprob=logprob_results, axispop=axispop, allpopnames=allpopnames, txt=txt,
-                                                    shapevec=shapevec, colvec=colvec, legend_pos=legend_pos, mark_impute=mark_impute,
-                                                    logten=logten, quantile_mat=quantile_mat, xyrange=xyrange, cexpts=cexpts,
-                                                    axis_labels=axis_labels, short_axis_labels=short_axis_labels,
-                                                    use_legend=use_legend, grayscale_quantiles=grayscale_quantiles)
-        else plot_logprob_manypop(logprob=logprob_results, refpopnames=refpopnames, allpopnames=allpopnames, txt=txt,
-                                  shapevec=shapevec, colvec=colvec, legend_pos=legend_pos, mark_impute=mark_impute,
-                                  dim1=dim1, dim2=dim2, xyrange=xyrange, cexpts=cexpts,
-                                  use_legend=use_legend)
+        if(plot_type=="twopop") plot_logprob_twopop(logprob=logprob_results,
+                                                    axispop=axispop,
+                                                    allpopnames=allpopnames, txt=txt,
+                                                    shapevec=shapevec, colvec=colvec,
+                                                    legend_pos=legend_pos,
+                                                    mark_impute=mark_impute,
+                                                    logten=logten,
+                                                    quantile_mat=quantile_mat,
+                                                    xyrange=xyrange, cexpts=cexpts,
+                                                    axis_labels=axis_labels,
+                                                    short_axis_labels=short_axis_labels,
+                                                    use_legend=use_legend,
+                                                    grayscale_quantiles=grayscale_quantiles)
+        else plot_logprob_manypop(logprob=logprob_results, refpopnames=refpopnames,
+                                  allpopnames=allpopnames, txt=txt,
+                                  shapevec=shapevec, colvec=colvec,
+                                  legend_pos=legend_pos, mark_impute=mark_impute,
+                                  dim1=dim1, dim2=dim2, xyrange=xyrange,
+                                  cexpts=cexpts, use_legend=use_legend)
     }
 }
 
 plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, colvec,
                                 legend_pos, mark_impute, logten, quantile_mat, xyrange,
-                                cexpts, use_legend=T, axis_labels=NULL, short_axis_labels=F,
-                                grayscale_quantiles=F){
+                                cexpts, use_legend=T, axis_labels=NULL,
+                                short_axis_labels=F, grayscale_quantiles=F){
 
     ## If quantile_mat=NULL, then no significance crosslines are plotted.
     ## Otherwise, quantile_mat is a matrix of values, e.g.
@@ -290,7 +311,8 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
     if(is.null(xyrange)) xyrange <- range(c(logprob[, refpopnames[1]], logprob[, refpopnames[2]])) +
             c(-0.05, 0.05) * diff(range(c(logprob[, refpopnames[1]], logprob[, refpopnames[2]])))
 
-    if (is.null(axis_labels) || !is.vector(axis_labels) || !is.character(axis_labels) || length(axis_labels) != 2)
+    if (is.null(axis_labels) || !is.vector(axis_labels) ||
+        !is.character(axis_labels) || length(axis_labels) != 2)
     {
         if (logten && short_axis_labels) label <- "LGP10 for population"
         else if (logten && !short_axis_labels) label <- "Log10 genotype probability for population"
@@ -306,9 +328,10 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
         ylabel <- axis_labels[2]
     }
 
-    plot(1, xlim=xyrange, ylim=xyrange, type="n", xlab=xlabel, ylab=ylabel, cex.lab=1, cex.main=1, cex.axis=1)
+    plot(1, xlim=xyrange, ylim=xyrange, type="n", xlab=xlabel, ylab=ylabel,
+         cex.lab=1, cex.main=1, cex.axis=1)
 
-    split.dat <- split(logprob, logprob$pop)
+    split_dat <- split(logprob, logprob$pop)
 
     ## Sort out colours if plotting points.  Any populations that have pch between
     ## 21 and 25 should have rimvec set to 1 for the rim:
@@ -319,14 +342,16 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
         ## Plot results for a single population.  If whichpop=1 then plot the
         ## first population in allpopnames, etc.
         pop <- allpopnames[whichpop]
-        popdat <- split.dat[[pop]]
+        popdat <- split_dat[[pop]]
         p1 <- popdat[[refpopnames[1]]]
         p2 <- popdat[[refpopnames[2]]]
         switch(txt,
                pop = text(p1, p2, pop, col=colvec[whichpop]),
                subpop = text(p1, p2, popdat$subpop, col=colvec[whichpop]),
                id = text(p1, p2, popdat$id, col=colvec[whichpop]),
-               points = points(p1, p2, col=rimvec[whichpop], pch=shapevec[whichpop], bg=colvec[whichpop], cex=cexpts),
+               points = points(p1, p2, col=rimvec[whichpop],
+                               pch=shapevec[whichpop],
+                               bg=colvec[whichpop], cex=cexpts),
                stop("txt should be pop, subpop, id, or points"))
 
     }
@@ -376,41 +401,46 @@ plot_logprob_twopop <- function(logprob, axispop, allpopnames, txt, shapevec, co
                logprob[logprob$status=="impute", refpopnames[2]], pch="*")
 }
 
-plot_logprob_manypop <- function(logprob, refpopnames, allpopnames, txt, shapevec, colvec, legend_pos,
-                                 mark_impute, dim1, dim2, xyrange, cexpts, use_legend=T){
+plot_logprob_manypop <- function(logprob, refpopnames, allpopnames, txt,
+                                 shapevec, colvec, legend_pos, mark_impute,
+                                 dim1, dim2, xyrange, cexpts, use_legend=T){
 
     ## PCA ---------------------------------------------------------------------
     ## Do the PCA on the matrix of imputed log-likelihoods, and set up plot:
 
     ## catline("Colours", colvec)
     pca.mat <- prcomp(logprob[refpopnames])
-    if(is.null(xyrange)) xyrange <- range(pca.mat$x[ , c(dim1, dim2)]) + c(-0.2, 0.05)*diff(range(pca.mat$x[ , c(dim1, dim2)]))
-    plot(1, xlim=xyrange, ylim=xyrange, type="n", cex.lab=1.3, cex.main=1.4, cex.axis=1.2, xlab="", ylab="")
+    if(is.null(xyrange)) xyrange <- range(pca.mat$x[ , c(dim1, dim2)]) +
+                                    c(-0.2, 0.05)*diff(range(pca.mat$x[ , c(dim1, dim2)]))
+    plot(1, xlim=xyrange, ylim=xyrange, type="n", cex.lab=1.3,
+         cex.main=1.4, cex.axis=1.2, xlab="", ylab="")
 
-    ## Join the PCA matrix onto the columns of logprob.  The new columns are called PC1, PC2, etc.
+    ## Join the PCA matrix onto the columns of logprob.  The new columns are
+    ## called PC1, PC2, etc.
     logprob <- cbind(logprob, pca.mat$x)
-    PC1name <- paste("PC", dim1, sep="")
-    PC2name <- paste("PC", dim2, sep="")
+    PC1_name <- paste("PC", dim1, sep="")
+    PC2_name <- paste("PC", dim2, sep="")
 
-    split.dat <- split(logprob, logprob$pop)
+    split_dat <- split(logprob, logprob$pop)
 
-    ## Sort out colours if plotting points.  Any populations that have pch between 21 and 25 should have
-    ## rimvec set to 1 for the rim:
+    ## Sort out colours if plotting points.  Any populations that have pch
+    ## between 21 and 25 should have rimvec set to 1 for the rim:
     rimvec <- colvec
     if(txt=="points" | txt=="id") rimvec[21 <= shapevec & shapevec <= 25] <- "black"
 
     plot_single_pop <- function(whichpop){
-        ## Plot results for a single population.  If whichpop=1 then plot the first population in
-        ## allpopnames, etc.
+        ## Plot results for a single population.  If whichpop=1 then plot the
+        ## first population in allpopnames, etc.
         pop <- allpopnames[whichpop]
-        popdat <- split.dat[[pop]]
-        p1 <- popdat[[PC1name]]
-        p2 <- popdat[[PC2name]]
+        popdat <- split_dat[[pop]]
+        p1 <- popdat[[PC1_name]]
+        p2 <- popdat[[PC2_name]]
         switch(txt,
                pop = text(p1, p2, pop, col=colvec[whichpop]),
                subpop = text(p1, p2, popdat$subpop, col=colvec[whichpop]),
                id = text(p1, p2, popdat$id, col=colvec[whichpop]),
-               points = points(p1, p2, col=rimvec[whichpop], pch=shapevec[whichpop], bg=colvec[whichpop], cex=cexpts),
+               points = points(p1, p2, col=rimvec[whichpop], pch=shapevec[whichpop],
+                               bg=colvec[whichpop], cex=cexpts),
                stop("txt should be pop, subpop, id, or points"))
     }
 
@@ -418,8 +448,8 @@ plot_logprob_manypop <- function(logprob, refpopnames, allpopnames, txt, shapeve
     sapply(1:npop, plot_single_pop)
 
     if((txt=="points" | txt=="id") && use_legend) {
-        legend(legend_pos, pch=shapevec[1:npop], col=rimvec[1:npop], pt.bg=colvec[1:npop],
-               legend=allpopnames, cex=1.2)
+        legend(legend_pos, pch=shapevec[1:npop], col=rimvec[1:npop],
+               pt.bg=colvec[1:npop], legend=allpopnames, cex=1.2)
     }
 
     ## Find the percentage variances explained by each of the axes.
@@ -430,30 +460,36 @@ plot_logprob_manypop <- function(logprob, refpopnames, allpopnames, txt, shapeve
     perc.var1 <- format(perc.var[dim1], digits=2)
     perc.var2 <- format(perc.var[dim2], digits=2)
     perc.var12 <- format(perc.var[dim1] + perc.var[dim2], digits=2)
-    #         title(sub=paste("%var: ", PC1name, "=", perc.var1, "; ", PC2name, "=", perc.var2, "; Tot=",
+    #         title(sub=paste("%var: ", PC1_name, "=", perc.var1, "; ", PC2_name, "=", perc.var2, "; Tot=",
     #               perc.var12, sep=""), cex.sub=1.5, line=2.5)
-    mtext(paste(PC1name, "%var",perc.var1), side=1, line=2, cex=1.3)
-    mtext(paste(PC2name, "%var",perc.var2), side=2, line=2, cex=1.3)
+    mtext(paste(PC1_name, "%var",perc.var1), side=1, line=2, cex=1.3)
+    mtext(paste(PC2_name, "%var",perc.var2), side=2, line=2, cex=1.3)
 
     ## Flag the points gained by imputation if required:
     if(mark_impute)
-        points(logprob[logprob$status=="impute", PC1name], logprob[logprob$status=="impute",
-                                                                   PC2name], pch="*")
+        points(logprob[logprob$status=="impute", PC1_name],
+               logprob[logprob$status=="impute", PC2_name], pch="*")
 }
 
 plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logten,
-                                 quantile_mat, posterior_nu_list=NULL, all_loci_sim_logprob=NULL,
-                                 axis_labels=NULL, use_legend=T, layout_already_set=F){
+                                 quantile_mat, posterior_nu_list=NULL,
+                                 all_loci_sim_logprob=NULL, axis_labels=NULL,
+                                 use_legend=T, layout_already_set=F){
     ## bars.plot 29/04/2015 (based on earlier version from Masters project Rfunc_bars.R)
-    ## Plot series of bar charts, one for each reference population, showing the log-probabilities for every single individual (ref pop individuals and other individuals), with different coloured bars for different populations
+    ## Plot series of bar charts, one for each reference population, showing the
+    ## log-probabilities for every single individual (ref pop individuals and
+    ## other individuals), with different coloured bars for different
+    ## populations
     ## Logs in base 10 if logten=T, or base e if logten=F
     ## If quantile_mat=NULL, then no significance crosslines are plotted.
     ## Otherwise, quantile_mat is a matrix of values, e.g.
     ##              1%   99%
     ## Pop1   -37.3 -25.7
     ## Pop2 -29.8 -11.9
-    ## giving the quantiles of the corresponding distributions of genotype probabilities.
-    ## If the quantiles are included, then they will be plotted as horizontal lines on top of the bar charts for each population
+    ## giving the quantiles of the corresponding distributions of genotype
+    ## probabilities.
+    ## If the quantiles are included, then they will be plotted as horizontal
+    ## lines on top of the bar charts for each population
 
     if (!is.null(axis_labels) && (!is.vector(axis_labels) || !is.character(axis_labels)
                                   || length(axis_labels) != length(refpopnames)))
@@ -461,14 +497,15 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
         stop("axis_labels must be a character vector, the same length as refpopnames")
     }
 
-    split.dat <- split(logprob, logprob$pop)
+    split_dat <- split(logprob, logprob$pop)
 
     bgvec <- colvec
 
     ## Set up layout of plots and legend
     if (!layout_already_set)
     {
-        if (use_legend) layout(matrix(1:(length(refpopnames)+1), ncol=1), heights=c(rep(2,times=length(refpopnames)),1))
+        if (use_legend) layout(matrix(1:(length(refpopnames)+1), ncol=1),
+                               heights=c(rep(2,times=length(refpopnames)),1))
         else layout(matrix(1:(length(refpopnames)), ncol=1))
     }
 
@@ -477,17 +514,17 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
 
     ## Get sorting order for individuals in reference populations
     ## Sort them in order of log-probs for their own population
-    rat.order = list()
+    indiv_order = list()
 
     for (i in 1:length(refpopnames))
     {
-        popdat = split.dat[[refpopnames[i]]]
+        popdat = split_dat[[refpopnames[i]]]
         probs = popdat[[refpopnames[i]]]
-        rat.order[[i]] = order(probs, decreasing=TRUE)
+        indiv_order[[i]] = order(probs, decreasing=TRUE)
     }
 
-    all.heights = matrix(0, nrow = nrow(logprob), ncol = length(refpopnames))
-    all.colours = matrix(0, nrow = nrow(logprob), ncol = length(refpopnames))
+    all_heights = matrix(0, nrow = nrow(logprob), ncol = length(refpopnames))
+    all_colours = matrix(0, nrow = nrow(logprob), ncol = length(refpopnames))
 
     for (i in 1:length(refpopnames))
     {
@@ -498,14 +535,14 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
         for (j in 1:length(allpopnames))
         {
             pop <- allpopnames[j]
-            popdat <- split.dat[[pop]]
-            this.ref.pop.probs <- popdat[[refpopnames[i]]]
+            popdat <- split_dat[[pop]]
+            this_refpop_probs <- popdat[[refpopnames[i]]]
 
             ## If this is one of the ref pops, order the individuals by their log
             ## probabilities with respect to their own population
             ## i.e. order "Taik" individuals by their log probs for the "Taik" population
             ref_pop_idx = match(pop, refpopnames)
-            if (!is.na(ref_pop_idx)) this.ref.pop.probs <- this.ref.pop.probs[rat.order[[ref_pop_idx]]]
+            if (!is.na(ref_pop_idx)) this_refpop_probs <- this_refpop_probs[indiv_order[[ref_pop_idx]]]
 
             ## If the simulated individual data or the saddlepoint stuff is available,
             ## convert to using CDF values instead
@@ -513,12 +550,12 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
             {
                 ECDF <- ecdf(all_loci_sim_logprob[refpopnames[i],])
 
-                this.ref.pop.cdf.values = ECDF(this.ref.pop.probs)
+                this_refpop_cdf_values = ECDF(this_refpop_probs)
 
                 ## Any heights that are too small should be replaced with zeros
                 heights[which(heights < 1E-3)] <- 0
 
-                heights <- c(heights, this.ref.pop.cdf.values)
+                heights <- c(heights, this_refpop_cdf_values)
 
             }
             else if (!is.null(posterior_nu_list))
@@ -527,40 +564,41 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
                 ## not the sample population being looked at!
                 ## Extract the posterior allele frequencies for this pop, keeping
                 ## them as a LIST
-                post.nu.pop <- lapply(posterior_nu_list, function(x) x[refpopnames[i],])
-                post.info <- calc.multi.locus.probs.func(post.nu.pop)
-                multi.K.params <- make.K.params(post.info$dist)
-                mean.pop <- mu(multi.K.params)
-                this.ref.pop.cdf.values <- sapply(this.ref.pop.probs, Fhat,
-                                                  post.info, mean.pop=mean.pop, logten=logten)
+                post_nu_pop <- lapply(posterior_nu_list, function(x) x[refpopnames[i],])
+                post_info <- calc.multi.locus.probs.func(post_nu_pop)
+                multi_K_params <- make.K.params(post_info$dist)
+                mean_pop <- mu(multi_K_params)
+                this_refpop_cdf_values <- sapply(this_refpop_probs, Fhat,
+                                                  post_info, mean.pop=mean_pop, logten=logten)
 
                 ## Any heights that are too small should be replaced with zeros
                 heights[which(heights < 1E-3)] <- 0
 
-                heights <- c(heights, this.ref.pop.cdf.values)
+                heights <- c(heights, this_refpop_cdf_values)
             }
             else
             {
-                heights <- c(heights, this.ref.pop.probs)
+                heights <- c(heights, this_refpop_probs)
             }
 
-            colours <- c(colours, rep(colvec[j],times=length(this.ref.pop.probs)))
+            colours <- c(colours, rep(colvec[j],times=length(this_refpop_probs)))
         }
 
         # Use 100*heights to get readable percent values
-        all.heights[,i] <- heights*100
-        all.colours[,i] <- colours
+        all_heights[,i] <- heights*100
+        all_colours[,i] <- colours
     }
 
-    min.all.pops <- min(all.heights, na.rm = TRUE)
+    min.all.pops <- min(all_heights, na.rm = TRUE)
 
     for (i in 1:length(refpopnames))
     {
-        heights <- all.heights[,i]
-        colours <- all.colours[,i]
+        heights <- all_heights[,i]
+        colours <- all_colours[,i]
 
         ## Set up the individual plot title
-        if (is.null(axis_labels)) title <- paste0("Percentiles for population ", refpopnames[i], ", by individual")
+        if (is.null(axis_labels)) title <- paste0("Percentiles for population ",
+                                                  refpopnames[i], ", by individual")
         else title <- axis_labels[i]
 
         if (!is.null(all_loci_sim_logprob))
