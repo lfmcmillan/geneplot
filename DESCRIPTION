@@ -1,7 +1,7 @@
 Package: geneplot
 Type: Package
 Title: Genetic Assignment and Plotting
-Version: 0.1.1
+Version: 0.1.2
 Authors: Louise McMillan <louise.mcmillan@auckland.ac.nz> and Rachel Fewster
 Authors@R: c(
     person("Louise", "McMillan", email = "louise.mcmillan@auckland.ac.nz", role = c("cre","aut")),

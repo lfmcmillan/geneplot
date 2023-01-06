@@ -334,7 +334,7 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
 
     write_output <- function(pop){
         cat("POP\n", file=outfile, append=T)
-        write.table(pop, outfile, row.names=F, colnames_locus=F, quote=F, sep="  ", append=T)
+        write.table(pop, outfile, row.names=F, col.names=F, quote=F, sep="  ", append=T)
     }
 
     lapply(dat_split, write_output)
