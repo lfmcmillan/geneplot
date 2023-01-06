@@ -11,7 +11,7 @@ geneplot(
   includepopnames = NULL,
   prior = "Rannala",
   saddlepoint = T,
-  leave_one_out = F,
+  leave_one_out = T,
   logten = T,
   min_loci = 6,
   quantiles = c(0.01, 1),
@@ -91,14 +91,14 @@ for microsatellite data with varying numbers of alleles at each locus.}
 saddlepoint method for imputing missing data/leave-one-out results.
 For more details, see McMillan and Fewster (2017), Biometrics.}
 
-\item{leave_one_out}{Boolean (default FALSE), indicates whether or not to
+\item{leave_one_out}{Boolean (default TRUE), indicates whether or not to
 calculate leave-one-out results for any individual from the reference
-pops. If TRUE, any individual from a reference population will have their
-Log-Genotype-Probability with respect to their own reference population
-after temporarily removing the individual's genotype from the sample
-data for that reference population. The individual's Log-Genotype-Probabilities
-with respect to all populations they are not a member of will be calculated
-as normal.
+pops. If TRUE, any individual from a reference population will have
+their Log-Genotype-Probability with respect to their own reference
+population after temporarily removing the individual's genotype from the
+sample data for that reference population. The individual's
+Log-Genotype-Probabilities with respect to all populations they are not
+a member of will be calculated as normal.
 We STRONGLY RECOMMEND using leave-one-out=TRUE for any small reference
 samples (<30).}
 
@@ -357,11 +357,11 @@ Other attributes attached to the results object are:
 All individuals in \code{dat} whose population matches one of \code{refpopnames}
 will be included. Leave-one-out will be used when calculating the log-genotype
 probability for individual with respect to their own reference population,
-if specified in the inputs (default is NON leave-one-out).
+unless specified in the inputs (default is use leave-one-out).
 }
 \details{
-Default is NON leave-one-out but WE STRONGLY RECOMMEND USING LEAVE-ONE-OUT,
-ESPECIALLY FOR SMALL SAMPLES (<30).
+Default is leave-one-out. We STRONGLY RECOMMEND USING LEAVE-ONE-OUT,
+ESPECIALLY FOR SMALL SAMPLES (<30) but also for larger samples.
 
 \code{includepopnames} specifies which additional populations are plotted.
 It defaults to NULL, in which case only \code{refpopnames} will be plotted.

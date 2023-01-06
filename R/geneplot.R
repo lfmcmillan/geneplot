@@ -3,10 +3,10 @@
 #' All individuals in \code{dat} whose population matches one of \code{refpopnames}
 #' will be included. Leave-one-out will be used when calculating the log-genotype
 #' probability for individual with respect to their own reference population,
-#' if specified in the inputs (default is NON leave-one-out).
+#' unless specified in the inputs (default is use leave-one-out).
 #'
-#' Default is NON leave-one-out but WE STRONGLY RECOMMEND USING LEAVE-ONE-OUT,
-#' ESPECIALLY FOR SMALL SAMPLES (<30).
+#' Default is leave-one-out. We STRONGLY RECOMMEND USING LEAVE-ONE-OUT,
+#' ESPECIALLY FOR SMALL SAMPLES (<30) but also for larger samples.
 #'
 #' \code{includepopnames} specifies which additional populations are plotted.
 #' It defaults to NULL, in which case only \code{refpopnames} will be plotted.
@@ -141,7 +141,7 @@ geneplot <- function(dat, refpopnames, locnames,
                      includepopnames=NULL,
                      prior="Rannala",
                      saddlepoint=T,
-                     leave_one_out=F,
+                     leave_one_out=T,
                      logten=T,
                      min_loci=6,
                      quantiles=c(0.01, 1.00),

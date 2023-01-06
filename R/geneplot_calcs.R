@@ -76,14 +76,14 @@
 #'      saddlepoint method for imputing missing data/leave-one-out results.
 #'      For more details, see McMillan and Fewster (2017), Biometrics.
 #'
-#' @param leave_one_out Boolean (default FALSE), indicates whether or not to
+#' @param leave_one_out Boolean (default TRUE), indicates whether or not to
 #'      calculate leave-one-out results for any individual from the reference
-#'      pops. If TRUE, any individual from a reference population will have their
-#'      Log-Genotype-Probability with respect to their own reference population
-#'      after temporarily removing the individual's genotype from the sample
-#'      data for that reference population. The individual's Log-Genotype-Probabilities
-#'      with respect to all populations they are not a member of will be calculated
-#'      as normal.
+#'      pops. If TRUE, any individual from a reference population will have
+#'      their Log-Genotype-Probability with respect to their own reference
+#'      population after temporarily removing the individual's genotype from the
+#'      sample data for that reference population. The individual's
+#'      Log-Genotype-Probabilities with respect to all populations they are not
+#'      a member of will be calculated as normal.
 #'      We STRONGLY RECOMMEND using leave-one-out=TRUE for any small reference
 #'      samples (<30).
 #'
@@ -247,7 +247,7 @@ calc_logprob <- function(dat, refpopnames, locnames,
                          includepopnames=NULL,
                          prior="Rannala",
                          saddlepoint=T,
-                         leave_one_out=F,
+                         leave_one_out=T,
                          logten=T,
                          min_loci=6,
                          quantiles=c(0.01, 1.00),
