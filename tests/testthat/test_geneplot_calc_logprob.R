@@ -6,7 +6,7 @@ test_that("Default inputs for geneplot and calc_logprob match and are as expecte
 
     expect_equal(attributes(result_geneplot)$prior,"Rannala")
     expect_equal(attributes(result_geneplot)$saddlepoint,TRUE)
-    expect_equal(attributes(result_geneplot)$leave_one_out,FALSE)
+    expect_equal(attributes(result_geneplot)$leave_one_out,TRUE)
     expect_equal(attributes(result_geneplot)$logten,TRUE)
     expect_equal(attributes(result_geneplot)$min_loci,6)
 

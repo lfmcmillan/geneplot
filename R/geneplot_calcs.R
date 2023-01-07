@@ -324,8 +324,8 @@ calc_logprob <- function(dat, refpopnames, locnames,
     if((n_missing > 0 | !is.null(quantiles) | leave_one_out) & saddlepoint){
 
         # Calculate the SCDF for all loci
-        all_loci_SCDF_qsearch_params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
-                                                            leave_one_out=leave_one_out)
+        all_loci_SCDF_qsearch_params <- calc_qsearch_params_usingRcpp(posterior_nu_list, refpopnames,
+                                                                      logten=logten, leave_one_out=leave_one_out)
     } else if (!saddlepoint) {
         ## If saddlepoint has not been used, will need to have access to
         ## all_loci_sim_logprob as an attribute of logprob_results, in order to
@@ -365,17 +365,18 @@ calc_logprob <- function(dat, refpopnames, locnames,
         ###### Here, change to using quantiles from all-loci SCDF
         if (saddlepoint)
         {
-            if (leave_one_out) qsearch_params <- calc.qsearch.params(posterior_nu_list, refpopnames, logten=logten,
-                                                                     leave_one_out=leave_one_out)
+            if (leave_one_out) qsearch_params <- calc_qsearch_params_usingRcpp(
+                posterior_nu_list, refpopnames,
+                logten=logten, leave_one_out=leave_one_out)
             else qsearch_params <- all_loci_SCDF_qsearch_params
-            ## Make sure to use leave-one-out for calc.quantiles.uniroot as well as
-            ## for calc.qsearch.params, otherwise the K functions will not work
-            ## correctly -- need to be using the twoPops/leave-one-out mode for
-            ## all K functions when calculating leave-one-out quantiles
-            quantile_mat = calc.quantiles.uniroot(qsearch_params,
-                                                  posterior_nu_list, refpopnames,
-                                                  quantiles_vec, logten=logten,
-                                                  leave_one_out = leave_one_out)
+            ## Make sure to use leave-one-out for calc_quantiles_usingRcpp as
+            ## well as for calc_qsearch_params, otherwise the K functions will
+            ## not work correctly -- need to be using the twoPops/leave-one-out
+            ## mode for all K functions when calculating leave-one-out quantiles
+            quantile_mat <- calc_quantiles_usingRcpp(qsearch_params,
+                                                     posterior_nu_list, refpopnames,
+                                                     quantiles_vec, logten=logten,
+                                                     leave_one_out=leave_one_out)
 
             ## Add column headings to the quantile table
             colnames(quantile_mat) <- paste0(round(100*quantiles_vec,0),"%")
@@ -838,27 +839,26 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
             ###### For leave-one-out, if this individual is from this refpop,
             ###### use the Leave-One-Out allele frequencies for the
             ###### reduced set of loci
-            if (leave_one_out & indiv_dat$pop==rpop) post_nu_pop <- lapply(LOO_posterior_nu_list[locnames_present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
-            else post_nu_pop <- lapply(posterior_nu_list[locnames_present], function(x) x[rpop,]) ## Note: must use "lapply" to preserve correct format
+            ## Note for next two lines: must use "lapply" to preserve correct
+            ## format and ,drop=FALSE to preserve correct matrix format
+            if (leave_one_out & indiv_dat$pop==rpop) post_nu_pop <- lapply(LOO_posterior_nu_list[locnames_present], function(x) x[rpop,,drop=FALSE])
+            else post_nu_pop <- lapply(posterior_nu_list[locnames_present], function(x) x[rpop,,drop=FALSE])
             if (length(post_nu_pop) == 0) browser()
-            # post_info <- calc.multi.locus.probs.func(post_nu_pop)
-            post_info <- calc.multi.locus.probs.func(post_nu_pop, leave_one_out=leave_one_out)
-            multi_K_params <- make.K.params(post_info$dist)
-            # mean_pop <- mu(multi_K_params)
-            # indiv_p <- Fhat(log_indiv_present[rpop], post_info, mean_pop=mean_pop, logten=logten)
-            mean_pop <- mu(multi_K_params, twoPops=leave_one_out)
-            indiv_p <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
+
+            post_info <- rcpp_calc_multi_locus_dist(post_nu_pop, leave_one_out=leave_one_out)
+            mean_pop <- rcpp_calc_mu(post_info$dist)
+            indiv_p <- rcpp_calc_Fhat(log_indiv_present[rpop], post_info$dist, post_info$min, post_info$max, mean_pop, logten=logten)
 
             if (is.na(indiv_p))
             {
                 print("indiv_p is NA")
-                test <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
+                test <- rcpp_calc_Fhat(log_indiv_present[rpop], post_info$dist, post_info$min, post_info$max, mean_pop, logten=logten)
             }
 
             if (is.infinite(indiv_p))
             {
                 print("indiv_p is infinite")
-                test <- Fhat(log_indiv_present[rpop], post_info, mean.pop=mean_pop, logten=logten, twoPops=leave_one_out)
+                test <- rcpp_calc_Fhat(log_indiv_present[rpop], post_info$dist, post_info$min, post_info$max, mean_pop, logten=logten)
             }
         }
         else
@@ -875,8 +875,8 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
             if (is.null(all_loci_SCDF_qsearch_params)) stop("all_loci_SCDF_qsearch_params cannot be null when using saddlepoint.")
 
             #print("Starting to calculate the quantiles for a single population")
-            q <- calc.quantiles.uniroot(all_loci_SCDF_qsearch_params, posterior_nu_list,
-                                        rpop, indiv_p, logten=logten, leave_one_out=leave_one_out)
+            q <- calc_quantiles_usingRcpp(all_loci_SCDF_qsearch_params, posterior_nu_list,
+                                          rpop, indiv_p, logten=logten, leave_one_out=leave_one_out)
             #print("Calculated the quantiles for a single population")
         }
         else
@@ -910,6 +910,48 @@ calc_logprob_missing <- function(row, dat_missing, refpopnames, locnames,
     c(log_indiv_probvec, log_indiv_present)
 } # end calc_logprob_missing
 
+calc_qsearch_params_usingRcpp <- function(posterior_nu_list, refpopnames, logten=FALSE, leave_one_out=FALSE)
+{
+    scdf_qsearch_params <- list()
+
+    for (pop in refpopnames)
+    {
+        ## Note: must use "lapply" specifically, in order to preserve the right format!!
+        ## Also need to use ,drop=FALSE to preserve the right format (matrix)
+        post_nu_pop <- lapply(posterior_nu_list, function(x) x[pop,,drop=FALSE])
+
+        post_info <- rcpp_calc_multi_locus_dist(post_nu_pop, leave_one_out=leave_one_out)
+
+        scdf_qsearch_params[[pop]] <- rcpp_calc_qsearch_params(post_info$dist, post_info$min,
+                                                               post_info$max, logten=logten)
+
+        if (is.na(scdf_qsearch_params[[pop]]$Fh_max)) browser()
+    }
+
+    scdf_qsearch_params
+}
+
+calc_quantiles_usingRcpp <- function(scdf_qsearch_params, posterior_nu_list, refpopnames, quantiles_vec, logten=FALSE, leave_one_out=FALSE)
+{
+    quantile_mat <- matrix(nrow = length(refpopnames), ncol = length(quantiles_vec))
+    rownames(quantile_mat) <- refpopnames
+
+    for (pop in refpopnames)
+    {
+        scdf_qsearch_params_pop <- scdf_qsearch_params[[pop]]
+        post_nu_pop <- sapply(posterior_nu_list, function(x) x[pop,,drop=FALSE])
+
+        for (i in 1:length(quantiles_vec))
+        {
+            quantile_mat[pop,i] <- rcpp_calc_Qhat(quantiles_vec[i], scdf_qsearch_params_pop,
+                                                  post_nu_pop, logten=logten)
+        }
+    }
+
+    rownames(quantile_mat) <- refpopnames
+
+    quantile_mat
+}
 
 find_nloc <- function(dat, locnames){
     ## find_nloc 10/6/10

@@ -497,6 +497,8 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
         stop("axis_labels must be a character vector, the same length as refpopnames")
     }
 
+    leave_one_out <- attributes(logprob)$leave_one_out
+
     split_dat <- split(logprob, logprob$pop)
 
     bgvec <- colvec
@@ -564,12 +566,13 @@ plot_logprob_barplot <- function(logprob, refpopnames, allpopnames, colvec, logt
                 ## not the sample population being looked at!
                 ## Extract the posterior allele frequencies for this pop, keeping
                 ## them as a LIST
-                post_nu_pop <- lapply(posterior_nu_list, function(x) x[refpopnames[i],])
-                post_info <- calc.multi.locus.probs.func(post_nu_pop)
-                multi_K_params <- make.K.params(post_info$dist)
-                mean_pop <- mu(multi_K_params)
-                this_refpop_cdf_values <- sapply(this_refpop_probs, Fhat,
-                                                  post_info, mean.pop=mean_pop, logten=logten)
+                ## Also use ,drop=FALSE to keep them in matrix format
+                post_nu_pop <- lapply(posterior_nu_list, function(x) x[refpopnames[i],,drop=FALSE])
+                post_info <- rcpp_calc_multi_locus_dist(post_nu_pop, leave_one_out = leave_one_out)
+                mean_pop <- rcpp_calc_mu(post_info$dist)
+                this_refpop_cdf_values <- sapply(this_refpop_probs, rcpp_calc_Fhat,
+                                                 post_info$dist, post_info$min, post_info$max,
+                                                 mean_dist=mean_pop, logten=logten)
 
                 ## Any heights that are too small should be replaced with zeros
                 heights[which(heights < 1E-3)] <- 0

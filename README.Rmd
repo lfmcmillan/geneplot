@@ -16,6 +16,14 @@ knitr::opts_chunk$set(
 library(geneplot)
 ```
 
+# Changelog for Version 0.2.0
+
+Changed to using Rcpp for internal saddlepoint calculations (Version 0.1.0 used all R code). 
+
+Also changed to use leave-one-out mode by default.
+
+Other changes are cosmetic and/or internal.
+
 # geneplot
 
 `geneplot` is an R package for genetic assignment and analysis of population structure. It can be used with microsatellite or SNP data. The algorithms are related to the GENECLASS2 software package. `geneplot` provides visualizations of the population structure and assignment results.
