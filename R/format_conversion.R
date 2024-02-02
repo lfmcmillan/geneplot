@@ -52,48 +52,48 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
 {
     if (!(digits_per_allele %in% 2:3)) stop("digits_per_allele must be 2 or 3.")
 
-    if (header) locStartLine <- 2
-    else locStartLine <- 1
+    if (header) loc_start_line <- 2
+    else loc_start_line <- 1
 
-    locEndLine <- NA
+    loc_end_line <- NA
     con <- file(file_path)
     open(con)
-    popStartLines <- vector()
-    currentLine <- 1
+    pop_start_lines <- vector()
+    current_line <- 1
     while (length(line <- readLines(con, n = 1, warn = FALSE)) > 0)
     {
         if (trimws(tolower(line)) == 'pop') {
-            if (is.na(locEndLine)) locEndLine <- currentLine-1
-            popStartLines <- c(popStartLines,currentLine+1)
+            if (is.na(loc_end_line)) loc_end_line <- current_line-1
+            pop_start_lines <- c(pop_start_lines,current_line+1)
         }
-        currentLine <- currentLine + 1
+        current_line <- current_line + 1
     }
     close(con)
 
     ### Read loci names
-    if (locEndLine == locStartLine) {
+    if (loc_end_line == loc_start_line) {
         ## If loci are a single comma-separated line, read in accordingly, but
         ## can't replace failed reading with artificial locus names because don't
         ## know how many loci there are if there was an error reading them in
-        rawLocnames <- read.table(file_path,header=FALSE,sep=",",skip=locStartLine-1,nrows=1,colClasses="character")
-        nloci <- ncol(rawLocnames)
+        raw_locnames <- read.table(file_path,header=FALSE,sep=",",skip=loc_start_line-1,nrows=1,colClasses="character")
+        nloci <- ncol(raw_locnames)
     } else {
-        nloci <- locEndLine-locStartLine+1
-        rawLocnames <- tryCatch({
-            read.table(file_path,header=FALSE,sep="",skip=locStartLine-1,nrows=nloci,colClasses="character")
+        nloci <- loc_end_line-loc_start_line+1
+        raw_locnames <- tryCatch({
+            read.table(file_path,header=FALSE,sep="",skip=loc_start_line-1,nrows=nloci,colClasses="character")
         }, error = function(err) { return(paste0("loc-",1:nloci)) })
     }
-    locnames <- trimws(unlist(rawLocnames))
+    locnames <- trimws(unlist(raw_locnames))
     names(locnames) <- NULL
 
     ### Read allelic data pop by pop
-    npops <- length(popStartLines)
-    popEndLines <- c(popStartLines[2:npops]-2,currentLine-1)
+    npops <- length(pop_start_lines)
+    pop_end_lines <- c(pop_start_lines[2:npops]-2,current_line-1)
 
-    rawDataList <- lapply(1:npops,function(pop){
+    raw_data_list <- lapply(1:npops,function(pop){
             dat <- tryCatch({
-            rawTab <- read.table(file_path, header=FALSE, sep="", colClasses="character",
-                       skip = popStartLines[pop]-1, nrows = popEndLines[pop]-popStartLines[pop]+1)
+            raw_tab <- read.table(file_path, header=FALSE, sep="", colClasses="character",
+                       skip = pop_start_lines[pop]-1, nrows = pop_end_lines[pop]-pop_start_lines[pop]+1)
 
             ## Remove the comma at the end of each identifier that is required in
             ## the Genepop format but not used by GenePlot -- but first check if
@@ -101,8 +101,8 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
             ## (Easypop generates Genepop files where there is a space between the
             ## population index and the comma in each line, and so when read in
             ## the comma appears as a separate column)
-            if (rawTab[1,2] == ",") rawTab <- rawTab[,-2]
-            else rawTab[,1] <- sapply(rawTab[,1],function(txt) unlist(strsplit(txt,",")))
+            if (raw_tab[1,2] == ",") raw_tab <- raw_tab[,-2]
+            else raw_tab[,1] <- sapply(raw_tab[,1],function(txt) unlist(strsplit(txt,",")))
 
             ## When adding ids or pop_names, note that the Genepop data is expected
             ## to turn up with pop as the FIRST column and id as the SECOND, so
@@ -110,48 +110,59 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
             ## this stage, add ids as column AFTER pop_names or add pop_names as
             ## the FIRST column.
             ## If IDs are non-unique,make unique ones and use the first ID as the popname
-            if (length(unique(rawTab[,1])) < nrow(rawTab))
+            if (length(unique(raw_tab[,1])) < nrow(raw_tab))
             {
-                popName <- rawTab[1,1]
-                if (!is.na(as.numeric(popName))) popName <- paste0("Pop",popName) ## Convert any purely numeric pop_names into "Pop#" to avoid errors in GenePlot
+                pop_name_raw <- raw_tab[1,1]
+                ## Convert any purely numeric popnames into "Pop#" to avoid errors in GenePlot
+                ## Put the attempt to convert name to numeric inside a tryCatch
+                ## because we are fine with it producing a warning about NAs
+                ## introduced by coercion so don't want the user to see the warning
+                pop_name <- tryCatch({
+                    suppressWarnings({
+                        if (!is.na(as.numeric(pop_name_raw))) pop_name <- paste0("Pop",pop_name_raw)
+                        else pop_name <- pop_name_raw
+                    })
+                }, error = function(e) {
+                    print(paste('error:', e))
+                })
 
-                rawTab <- cbind(rep(popName,times=nrow(rawTab)),paste0(popName,"-",1:nrow(rawTab)),rawTab[,2:ncol(rawTab)])
+                raw_tab <- cbind(rep(pop_name,times=nrow(raw_tab)),paste0(pop_name,"-",1:nrow(raw_tab)),raw_tab[,2:ncol(raw_tab)])
             }
             else ## If IDs are unique, make up popname
             {
-                popName <- paste0("Pop",pop)
-                rawTab <- cbind(rep(popName,nrow(rawTab)),rawTab)
+                pop_name <- paste0("Pop",pop)
+                raw_tab <- cbind(rep(pop_name,nrow(raw_tab)),raw_tab)
             }
 
             ## Make the first two column names "pop" and "id" so that if some pops
             ## had all unique IDs and other pops didn't, the first two columns still
             ## end up being called "pop" and "id" instead of the code call used
             ## to generate them
-            names(rawTab)[1] <- "pop"
-            names(rawTab)[2] <- "id"
+            names(raw_tab)[1] <- "pop"
+            names(raw_tab)[2] <- "id"
 
-            ## Now make sure to return the rawTab object
-            rawTab
+            ## Now make sure to return the raw_tab object
+            raw_tab
 
         }, error = function(err) { return(NULL) })
     })
 
-    rawData <- do.call(rbind,rawDataList)
+    raw_data <- do.call(rbind,raw_data_list)
 
     ### Tidy up allelic data and convert into GenePlot format
-    pop_data <- data.frame(id=rawData[,2],pop=rawData[,1]) ## Note switch order of id,pop
+    pop_data <- data.frame(id=raw_data[,2],pop=raw_data[,1]) ## Note switch order of id,pop
     if (diploid){
         for (locIdx in 1:nloci)
         {
-            if (locIdx+2 <= ncol(rawData))
+            if (locIdx+2 <= ncol(raw_data))
             {
                 ## Extract the data for each of the alleles, converting it into numeric format instead of factors
-                rawAlleles <- rawData[,locIdx+2]
+                raw_alleles <- raw_data[,locIdx+2]
 
-                # if (any(nchar(rawAlleles) < 2*digits_per_allele)) browser()
+                # if (any(nchar(raw_alleles) < 2*digits_per_allele)) browser()
 
-                allele1 <- as.numeric(sapply(rawAlleles,substr,start=1,stop=digits_per_allele))
-                allele2 <- as.numeric(sapply(rawAlleles,substr,start=digits_per_allele+1,stop=2*digits_per_allele))
+                allele1 <- as.numeric(sapply(raw_alleles,substr,start=1,stop=digits_per_allele))
+                allele2 <- as.numeric(sapply(raw_alleles,substr,start=digits_per_allele+1,stop=2*digits_per_allele))
 
                 pop_data <- cbind(pop_data,allele1,allele2)
             }
@@ -160,7 +171,7 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
     }
     else
     {
-        pop_data <- cbind(pop_data,as.numeric(rawData[3:ncol(rawData)]))
+        pop_data <- cbind(pop_data,as.numeric(raw_data[3:ncol(raw_data)]))
         names(pop_data) <- c("id","pop", paste0(locnames,".a1"))
     }
 
@@ -170,10 +181,10 @@ read_genepop_format <- function(file_path,header=TRUE,diploid=TRUE,digits_per_al
 
     ## If the user has entered pop_names, use those
     if (!is.null(pop_names)) {
-        datpop_names <- unique(pop_data$pop)
-        if (length(pop_names) != length(datpop_names)) stop("The length of pop_names does not match the number of pops in the data. Please check and try again.")
-        for (pop in 1:length(datpop_names)) {
-            pop_data$pop[which(pop_data$pop == datpop_names[pop])] <- pop_names[pop]
+        dat_pop_names <- unique(pop_data$pop)
+        if (length(pop_names) != length(dat_pop_names)) stop("The length of pop_names does not match the number of pops in the data. Please check and try again.")
+        for (pop in 1:length(dat_pop_names)) {
+            pop_data$pop[which(pop_data$pop == dat_pop_names[pop])] <- pop_names[pop]
         }
     }
 
@@ -252,9 +263,9 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
     if(min_loci_per_indiv>1){
         ## Find number of non-missing loci (allele anything except 0) for each
         ## individual.
-        ## If there is missing data at a locus, the loc.a1 entry and loc.a2
+        ## If there is missing data at a locus, the loc_a1 entry and loc_a2
         ## entry will both be 0.
-        ## Use only the loc.a1 entry.
+        ## Use only the loc_a1 entry.
         nloc_dat <- dat[, paste0(locnames_all, ".a1")]
         nloc <- apply(nloc_dat, 1, function(x) length(x[x!=0]))
         cat("WARNING! Excluding all individuals with <", min_loci_per_indiv,
@@ -265,13 +276,13 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
 
     ##--------------------------------------------------------------------------------------------
     ## Create the names of the desired loci:
-    if(is.null(delete_loc)) locnames_foruse <- locnames_all
-    else locnames_foruse <- locnames_all[-delete_loc]
+    if(is.null(delete_loc)) locnames_for_use <- locnames_all
+    else locnames_for_use <- locnames_all[-delete_loc]
 
     ##--------------------------------------------------------------------------------------------
     ## Isolate the column numbers for the required columns:
-    colnames_a1 <- paste0(locnames_foruse, ".a1")
-    colnames_a2 <- paste0(locnames_foruse, ".a2")
+    colnames_a1 <- paste0(locnames_for_use, ".a1")
+    colnames_a2 <- paste0(locnames_for_use, ".a2")
     colnames_locus <- sort(c(colnames_a1, colnames_a2))
     dat_out <- dat[,c("id", "pop", colnames_locus)]
 
@@ -283,7 +294,7 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
 
     ##--------------------------------------------------------------------------------------------
     ## For each locus in turn, replace the allele labels with 00 (missing), 01, 02, ...10, 11, ...
-    for(loc in locnames_foruse){
+    for(loc in locnames_for_use){
         col_a1 <- paste0(loc, ".a1")
         col_a2 <- paste0(loc, ".a2")
         loc_a1 <- dat_out[, col_a1]
@@ -293,8 +304,8 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
         loctab <- table(locboth)
         loctab_names <- names(loctab)
         ## Number of visible alleles (non-null):
-        n_visalleles <- length(loctab[loctab_names!="0"])
-        new_names <- as.character(1:n_visalleles)
+        nvisible_alleles <- length(loctab[loctab_names!="0"])
+        new_names <- as.character(1:nvisible_alleles)
         ## Add leading zeros:
         new_names[1:9] <- paste("0", new_names[1:9], sep="")
         ## Add the missing code if there are any missing data at this locus.
@@ -317,7 +328,7 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
     ## Awa,     0505    0711     0102     ...  etc.
     # dat_new <- data.frame(id=paste0(dat_out$pop, ","))
     dat_new <- data.frame(id=paste0(dat_out$id,","))
-    for(loc in locnames_foruse){
+    for(loc in locnames_for_use){
         col_a1 <- paste(loc, ".a1", sep="")
         col_a2 <- paste(loc, ".a2", sep="")
         dat_new[,loc] <- paste0(dat_out[,col_a1], dat_out[,col_a2])
@@ -330,7 +341,7 @@ write_genepop_format <- function(dat, outfile, locnames_all, delete_loc=NULL, mi
     ##--------------------------------------------------------------------------------------------
     ## Now write the results into outfile in the required Genepop format:
     cat(outfile, file=outfile, "\n", append=F)
-    for(ln in paste(sort(locnames_foruse))) cat(ln, "\n", file=outfile, append=T)
+    for(ln in paste(sort(locnames_for_use))) cat(ln, "\n", file=outfile, append=T)
 
     write_output <- function(pop){
         cat("POP\n", file=outfile, append=T)
