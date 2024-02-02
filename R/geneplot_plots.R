@@ -184,7 +184,7 @@ plot_logprob <- function(logprob_results,
     {
         if(!is.null(axispop) &&
            (!is.character(axispop) || !is.vector(axispop) ||
-            names(axispop) != c("x","y"))) stop("axispop must be specified in the form c(x='Pop1',y='Pop2')")
+            !all(sort(names(axispop)) == c("x","y")))) stop("axispop must be specified in the form c(x='Pop1',y='Pop2')")
     }
 
     ## Shapes and colours ------------------------------------------------------
