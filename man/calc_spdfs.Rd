@@ -14,7 +14,7 @@ calc_spdfs(
   plot_spdfs = FALSE,
   difference_threshold = 0,
   show_quantiles = TRUE,
-  quantiles_vec = c(0.01),
+  quantiles_vec = c(0.01, 1),
   prior = "Rannala",
   logten = T,
   leave_one_out = T,
