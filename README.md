@@ -1,6 +1,81 @@
 
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
+# Changelog for Version 1.0.0
+
+The latest version includes not only the original GenePlot visualization, but 
+also the genetic distribution calculations that produce additional side-plots 
+and statistical measures that summarise the separation between pairs of 
+populations on the basis of how easy it is to accurately assign individuals
+to one population or the other.
+
+The `extended_geneplot()` function plots a GenePlot with two additional side
+plots showing directional analyses of the connectivity of the two reference
+populations. The side plots show the genetic distribution of each reference
+population and the other population compared with it.
+
+Suppose populations A and B are plotted on the GenePlot with the x-axis
+showing fit to B (i.e. Log-Genotype Probabilities with respect to B) and the
+y-axis showing fit to A (i.e. Log-Genotype Probabilities with respect to A).
+
+Then the auxiliary plot at the bottom of the GenePlot will show the
+saddlepoint distribution plots for baseline B. The solid curve shows the
+genetic distribution of baseline B with itself: it is the distribution of
+Log-Genotype Probabilities for all genotypes that could arise from B. The
+dashed curve matching the colour of the other reference population, A, shows
+the comparison distribution of A into B. For all the genotypes that could
+arise from B, this shows how often those would arise in A. If B and A are
+very different genetically then a lot of the genotypes that would have a very
+good fit to B may only occur rarely in A, and the genotypes that occur
+commonly in A may have a poor fit to B, and this would be shown by a low
+amount of overlap between these two curves. On the other hand, if B and A are
+genetically similar then genotypes that commonly occur in A also have a good
+fit to B, and so there will be a high amount of overlap between the two
+curves.
+
+The auxiliary plot on the left of the GenePlot will show similar curves, but
+for baseline A, so the solid curve is the genetic distribution of A with itself
+and the dashed curve is the genetic distribution of B into A. A low overlap
+here means that genotypes that commonly occur in B would have a poor fit to A.
+A high overlap here means that genotypes that commonly occur in B would have
+a good fit to A as well as B.
+
+`extended_geneplot()` also calculates three statistical measures that 
+summarise the genetic differentiation between populations A and B. Or these can
+be calculated without the plot, using the `calc_spdfs()` function.
+
+All three measures are **directional**, meaning that for two populations, A
+and B, there is an A to B value and a separate B to A value. The function
+calculates all three measures in both directions, i.e. with each of the
+reference populations as the baseline in turn.
+
+1) **Overlap Area (OA):** the area of overlap between the two auxiliary curves in
+one side of the extended GenePlot.
+
+2) **Incumbent Selection Probability (ISP):** what is the probability that if you
+take a random individual from baseline population B and another from comparison
+population A, the individual from B has a better fit to B than the individual
+from A has to population B?
+
+As an analogy, if you asked a random Dutch child and a random English child to
+take an English language test, what is the probability that the English child
+gets a higher mark than the Dutch child? (England is the baseline population B
+in this analogy.)
+
+3) **Home Assignment Probability (HAP):** what is the probability that if you take a
+random individual from baseline population B, the individul has better fit to
+population B than population A?
+
+As an analogy, if you pick a random English child and give them an English test
+and a Dutch test, what is the probability that they will do better at the
+English test? (England is again the baseline population in this analogy.)
+
+The three measures are based on saddlepoint approximations to various
+distributions relating to the fit of potential individual genotypes to two
+candidate source populations. "spdf" stands for Saddlepoint Probability Density
+Function, because the values calculated are based on probability density
+functions.
+
 # Changelog for Version 0.2.0
 
 Changed to using Rcpp for internal saddlepoint calculations (Version
@@ -22,7 +97,7 @@ assignment results.
 populations, to assess the level of genetic connectedness or separation
 among them. It also performs genetic assignment, comparing individuals
 to populations to determine the *source population* of each individual
-i.e. the population that the individual originated from.
+i.e. the population that the individual originated from.
 
 ## Installation
 
@@ -216,5 +291,21 @@ citation("geneplot")
 #>     doi = {10.1111/biom.12667},
 #>     url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/biom.12667},
 #>     abstract = {We propose a method for visualizing genetic assignment data by characterizing the distribution of genetic profiles for each candidate source population. This method enhances the assignment method of Rannala and Mountain (1997) by calculating appropriate graph positions for individuals for which some genetic data are missing. An individual with missing data is positioned in the distributions of genetic profiles for a population according to its estimated quantile based on its available data. The quantiles of the genetic profile distribution for each population are calculated by approximating the cumulative distribution function (CDF) using the saddlepoint method, and then inverting the CDF to get the quantile function. The saddlepoint method also provides a way to visualize assignment results calculated using the leave-one-out procedure. This new method offers an advance upon assignment software such as geneclass2, which provides no visualization method, and is biologically more interpretable than the bar charts provided by the software structure. We show results from simulated data and apply the methods to microsatellite genotype data from ship rats (Rattus rattus) captured on the Great Barrier Island archipelago, New Zealand. The visualization method makes it straightforward to detect features of population structure and to judge the discriminative power of the genetic data for assigning individuals to source populations.},
+#>   }
+#>
+#> To cite the extended geneplot and the three directional measures, please use:
+#>   McMillan, L. F., "Concepts of statistical analysis, visualization, and 
+#>   communication in population genetics" (2019). Doctoral thesis, 
+#>   https://researchspace.auckland.ac.nz/handle/2292/47358.
+#>
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @phdthesis{,
+#>     title = {Concepts of statistical analysis, visualization, and 
+#>   communication in population genetics},
+#>     author = {{McMillan} and L. F.},
+#>     school = {University of Auckland},
+#>     year = {2019},
+#>     url = {https://researchspace.auckland.ac.nz/handle/2292/47358}
 #>   }
 ```
