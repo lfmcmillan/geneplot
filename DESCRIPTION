@@ -2,11 +2,11 @@ Package: geneplot
 Type: Package
 Title: Genetic Assignment and Plotting
 Version: 0.2.0
-Authors: Louise McMillan <louise.mcmillan@auckland.ac.nz> and Rachel Fewster
+Authors: Louise McMillan <louise.mcmillan@vuw.ac.nz> and Rachel Fewster
 Authors@R: c(
-    person("Louise", "McMillan", email = "louise.mcmillan@auckland.ac.nz", role = c("cre","aut")),
+    person("Louise", "McMillan", email = "louise.mcmillan@vuw.ac.nz", role = c("cre","aut")),
     person("Rachel", "Fewster", role = "aut"))
-Maintainer: Louise McMillan <louise.mcmillan@auckland.ac.nz>
+Maintainer: Louise McMillan <louise.mcmillan@vuw.ac.nz>
 Description: Run genetic assignment and plot the results. Compare populations and 
     individuals using microsatellite or SNP data and calculate and plot
     log-genotype-probabilities for each individual with respect to all of the 
@@ -14,7 +14,7 @@ Description: Run genetic assignment and plot the results. Compare populations an
 License: GPL-3 
 Encoding: UTF-8
 LazyData: true
-RoxygenNote: 7.2.1
+RoxygenNote: 7.3.2
 Suggests: 
     knitr,
     rmarkdown,

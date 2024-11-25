@@ -124,7 +124,7 @@
 #'      missing data, or when calculating quantiles of the distribution. For
 #'      more details, see McMillan and Fewster (2017), Biometrics.
 #'
-#' @return The structure of the output from \code{calc_logprob} and/or \code{geneplot}
+#' @returns The structure of the output from \code{calc_logprob} and/or \code{geneplot}
 #' is a data frame, with one row per individual.
 #'
 #' The first two columns are "id" and "pop", as in the input data.
@@ -223,11 +223,11 @@
 #' @references McMillan, L. and Fewster, R. "Visualizations for genetic assignment
 #'  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
 #'
-#'  Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using
+#' @references Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using
 #'  multilocus genotypes. \emph{Proceedings of the National Academy of Sciences}
 #'  \strong{94}, 9197--9201.
 #'
-#'  Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+#' @references Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
 #'  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
 #'  first-generation migrant detection. \emph{Journal of Heredity} \strong{95},
 #'  536--539.
@@ -469,6 +469,8 @@ calc_logprob <- function(dat, refpopnames, locnames,
     ## Attach the full-loci simulated distribution, which will be NULL except when
     ## saddlepoint=FALSE and quantiles are not NULL
     attributes(logprob_results)$all_loci_sim_logprob <- all_loci_sim_logprob
+
+    class(logprob_results) <- c(class(logprob_results), "geneplot")
 
     logprob_results
 }

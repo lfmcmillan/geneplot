@@ -36,7 +36,7 @@ trim <- function (x) gsub("^\\s+|\\s+$", "", x)
 #' @param pop_names (default NULL) Character vector (optional). Define the names
 #'     of the populations, in the order that they appear in the file.
 #'
-#' @return A list containing the following components:
+#' @returns A list containing the following components:
 #' #' \describe{
 #'   \item{\code{locnames}}{Character vector of the locus names.}
 #'   \item{\code{pop_data}}{The data, in a data frame, with two columns labelled as 'id' and

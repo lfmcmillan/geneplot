@@ -473,9 +473,11 @@ geneplot(dat, refpopnames=c("Mahu","Taik"), includepopnames=c("Flat"), locnames=
 \references{
 McMillan, L. and Fewster, R. "Visualizations for genetic assignment
  analyses using the saddlepoint approximation method" (2017) \emph{Biometrics}.
- Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
+
+Rannala, B., and Mountain, J. L. (1997). Detecting immigration by using multilocus
  genotypes. \emph{Proceedings of the National Academy of Sciences} \strong{94}, 9197--9201.
- Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
+
+Piry, S., Alapetite, A., Cornuet, J.-M., Paetkau, D., Baudouin, L., and
  Estoup, A. (2004). GENECLASS2: A software for genetic assignment and
  first-generation migrant detection. \emph{Journal of Heredity} \strong{95}, 536--539.
 }
